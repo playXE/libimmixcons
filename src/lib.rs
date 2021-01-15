@@ -315,6 +315,8 @@ pub extern "C" fn immix_init(
         if heap_size == 0 || heap_size <= 512 * 1024 {
             heap_size = 16 * BLOCK_SIZE;
             threshold = 100 * 1024;
+        } else if threshold == 0 {
+            threshold = ((30.0 * heap_size as f64) / 100.0).floor() as usize;
         }
         let mut space = Immix::new(heap_size, threshold);
         space.collect_roots_callback = Some(callback);
