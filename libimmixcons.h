@@ -42,8 +42,6 @@
 #define GC_STATE_SAFE 2
 #endif
 
-typedef struct Option_CollectRootsCallback Option_CollectRootsCallback;
-
 typedef struct TracerPtr {
   uintptr_t tracer[2];
 } TracerPtr;
@@ -136,7 +134,7 @@ void immix_noop_visit(uint8_t*, struct TracerPtr);
 void immix_init(uintptr_t *dummy_sp,
                 uintptr_t heap_size,
                 uintptr_t threshold,
-                struct Option_CollectRootsCallback callback,
+                CollectRootsCallback callback,
                 uint8_t *data);
 
 /**
