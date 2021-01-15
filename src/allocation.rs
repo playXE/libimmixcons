@@ -193,6 +193,7 @@ impl Allocator for NormalAllocator {
                     None
                 }
                 Some(block) => {
+                    #[cfg(feature = "threaded")]
                     unsafe {
                         self.recyc_lock.unlock();
                     }

@@ -298,6 +298,20 @@ unsafe impl Allocator for LibcAlloc {
             free(ptr.as_ptr() as *mut libc::c_void);
         }
     }
+
+    unsafe fn grow(
+        &self,
+        ptr: NonNull<u8>,
+        old_layout: Layout,
+        new_layout: Layout,
+    ) -> Result<NonNull<[u8]>, AllocError> {
+        if old_layout.size() == 0 {
+            return self.allocate(new_layout);
+        }
+        let raw_ptr = libc::realloc(ptr.as_ptr() as *mut libc::c_void, new_layout.size());
+        let ptr = NonNull::new(raw_ptr.cast::<u8>()).ok_or(AllocError)?;
+        Ok(NonNull::slice_from_raw_parts(ptr, new_layout.size()))
+    }
 }
 
 pub const fn round_down(x: u64, n: u64) -> u64 {

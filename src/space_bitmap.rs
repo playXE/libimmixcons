@@ -391,11 +391,11 @@ mod sync {
 #[cfg(not(feature = "threaded"))]
 #[allow(unused_variables)]
 mod unsync {
+    #[cfg(feature = "log")]
+    use crate::util::*;
     use core::fmt;
     use core::mem::size_of;
     use memmap::MmapMut;
-    #[cfg(feature = "log")]
-    use util::*;
     pub struct SpaceBitmap<const ALIGNMENT: usize> {
         mem_map: MmapMut,
         bitmap_begin: *mut usize,
@@ -472,7 +472,7 @@ mod unsync {
             debug!(
                 "Allocating space bitmap '{}' with size={}",
                 name,
-                formatted_size(bitmap_size)
+                crate::formatted_size(bitmap_size)
             );
             let mem_map = MmapMut::map_anon(bitmap_size).unwrap();
             Self::create_from_memmap(name, mem_map, heap_begin, heap_capacity)

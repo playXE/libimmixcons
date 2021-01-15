@@ -1,3 +1,4 @@
+#[cfg(feature = "threaded")]
 mod sync {
 
     use core::sync::atomic::{AtomicI8, Ordering};
@@ -193,7 +194,7 @@ mod unsync {
     ///
     ///
     #[no_mangle]
-    pub extern "c" fn immix_register_main_thread() {
+    pub extern "C" fn immix_register_main_thread() {
         /* no-op */
     }
     /// Register thread.
@@ -201,12 +202,12 @@ mod unsync {
     /// `sp`: pointer to variable on stack for searching roots on stack.
     ///
     #[no_mangle]
-    pub extern "c" fn immix_register_thread() {
+    pub extern "C" fn immix_register_thread() {
         /* no-op */
     }
     /// Unregister thread.
     #[no_mangle]
-    pub extern "c" fn immix_unregister_thread() {
+    pub extern "C" fn immix_unregister_thread() {
         /* no-op */
     }
     use core::cell::UnsafeCell;

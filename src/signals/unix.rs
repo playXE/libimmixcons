@@ -1,3 +1,4 @@
+#[cfg(feature = "threaded")]
 use crate::safepoint::*;
 use crate::threading::*;
 use crate::util::*;
@@ -20,21 +21,20 @@ unsafe extern "C" fn sigdie_handler(sig: i32, _info: *mut siginfo_t, _context: *
 }
 
 unsafe extern "C" fn segv_handler(sig: i32, info: *mut siginfo_t, context: *mut c_void) {
-    if addr_in_safepoint((&*info).si_addr() as _) {
-        #[cfg(feature = "threaded")]
-        {
-            //crate::threading::immix_get_tls_state().stack_end = get_sp!() as *mut u8;
+    #[cfg(feature = "threaded")]
+    {
+        if addr_in_safepoint((&*info).si_addr() as _) {
+            debug!(
+                "Stopped thread at {:p} for GC",
+                crate::threading::immix_get_tls_state()
+            );
+            set_gc_and_wait();
+            debug!(
+                "Thread at {:p} resumed",
+                crate::threading::immix_get_tls_state()
+            );
+            return;
         }
-        debug!(
-            "Stopped thread at {:p} for GC",
-            crate::threading::immix_get_tls_state()
-        );
-        set_gc_and_wait();
-        debug!(
-            "Thread at {:p} resumed",
-            crate::threading::immix_get_tls_state()
-        );
-        return;
     }
 
     sigdie_handler(sig, info, context);

@@ -135,7 +135,7 @@ mod _unix {
 pub use _unix::*;
 #[cfg(windows)]
 pub use _win::*;
-use atomic::Ordering;
+use core::sync::atomic::Ordering;
 #[cfg(feature = "threaded")]
 use parking_lot::lock_api::RawMutex;
 pub struct BlockAllocator {
@@ -179,7 +179,10 @@ impl BlockAllocator {
         if self.free_blocks.is_empty() {
             return self.build_block();
         }
-        self.lock.lock();
+        #[cfg(feature = "threaded")]
+        {
+            self.lock.lock();
+        }
         let block = self
             .free_blocks
             .pop()
@@ -188,7 +191,10 @@ impl BlockAllocator {
                 x
             })
             .or_else(|| self.build_block());
-        unsafe { self.lock.unlock() };
+        #[cfg(feature = "threaded")]
+        {
+            unsafe { self.lock.unlock() };
+        }
         block
     }
 
@@ -220,15 +226,20 @@ impl BlockAllocator {
 
     /// Return a collection of blocks.
     pub fn return_blocks(&mut self, blocks: impl IntoIterator<Item = *mut ImmixBlock>) {
-        self.lock.lock();
+        #[cfg(feature = "threaded")]
+        {
+            self.lock.lock();
+        }
         let iter = blocks.into_iter();
 
         iter.for_each(|block| {
             self.mmap.dontneed(block as *mut u8, BLOCK_SIZE); // MADV_DONTNEED or MEM_DECOMMIT
             self.free_blocks.push(block);
         });
-
-        unsafe { self.lock.unlock() }
+        #[cfg(feature = "threaded")]
+        unsafe {
+            self.lock.unlock()
+        }
     }
 
     /// Return the number of unallocated blocks.

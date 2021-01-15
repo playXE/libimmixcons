@@ -33,9 +33,7 @@ uintptr_t fooSize(uint8_t *_unused)
 }
 void visit_foo(uint8_t *self_, TracerPtr tracer)
 {
-
     Foo *self = (Foo *)self_;
-
     printf("trace %i\n", self->myInt->value);
     tracer_trace(tracer, (struct RawGc **)&self->myInt);
 }
@@ -49,4 +47,5 @@ void inner_main()
     Foo *foo = immix_alloc(8, &dummyRTTI);
     foo->myInt = obj;
     immix_collect(false);
+    printf("%p\n", &foo);
 }

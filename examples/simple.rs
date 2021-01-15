@@ -27,7 +27,7 @@ fn main() {
     immix_register_main_thread(&mut sp as *mut usize as *mut u8);
     {
         let p = immix_alloc_safe(42);
-        let s = immix_alloc_safe(Simple { x: p });
+        let _s = immix_alloc_safe(Simple { x: p });
         immix_collect(true);
     }
 }
