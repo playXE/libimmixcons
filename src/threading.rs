@@ -153,11 +153,13 @@ mod sync {
     /// at GC cycle.
     ///
     /// Returns current state to restore later.
+    #[no_mangle]
     pub extern "C" fn immix_unsafe_enter() -> i8 {
         immix_get_tls_state().gc_state_save_and_set(0)
     }
     /// Leave unsafe GC state and restore previous state from `state` argument. This function has yieldpoint internally so thread
     /// might be suspended for GC.
+    #[no_mangle]
     pub extern "C" fn immix_unsafe_leave(state: i8) -> i8 {
         immix_get_tls_state().gc_state_set(state, 0)
     }
@@ -165,10 +167,12 @@ mod sync {
     ///
     ///
     /// Returns current state to restore later.
+    #[no_mangle]
     pub extern "C" fn immix_safe_enter() -> i8 {
         immix_get_tls_state().gc_state_save_and_set(GC_STATE_SAFE)
     }
     /// Leave safe for GC state and restore previous state from `state` argument.
+    #[no_mangle]
     pub extern "C" fn immix_safe_leave(state: i8) -> i8 {
         immix_get_tls_state().gc_state_set(state, GC_STATE_SAFE)
     }
@@ -232,11 +236,13 @@ mod unsync {
     /// at GC cycle.
     ///
     /// Returns current state to restore later.
+    #[no_mangle]
     pub extern "C" fn immix_unsafe_enter() -> i8 {
         0
     }
     /// Leave unsafe GC state and restore previous state from `state` argument. This function has yieldpoint internally so thread
     /// might be suspended for GC.
+    #[no_mangle]
     pub extern "C" fn immix_unsafe_leave(state: i8) -> i8 {
         state
     }
@@ -244,10 +250,12 @@ mod unsync {
     ///
     ///
     /// Returns current state to restore later.
+    #[no_mangle]
     pub extern "C" fn immix_safe_enter() -> i8 {
         0
     }
     /// Leave safe for GC state and restore previous state from `state` argument.
+    #[no_mangle]
     pub extern "C" fn immix_safe_leave(state: i8) -> i8 {
         state
     }

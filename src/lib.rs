@@ -111,7 +111,9 @@ impl Immix {
                             v: &mut precise_roots,
                         } as &mut dyn Tracer),
                     },
-                    ConservativeTracer { roots: &mut cons },
+                    ConservativeTracer {
+                        roots: &mut cons as *mut Vec<(usize, usize)> as *mut u8,
+                    },
                 );
             }
             let mut roots: Vec<*mut RawGc> = Vec::new();

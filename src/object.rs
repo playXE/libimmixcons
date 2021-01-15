@@ -354,15 +354,17 @@ pub struct GCRTTI {
     pub finalizer: Option<extern "C" fn(*mut u8)>,
 }
 
+#[repr(C)]
 /// ConservativeTracer is passed into GC callback so users of this library can also provide some region of memory for conservative scan.
 pub struct ConservativeTracer {
-    pub roots: *mut alloc::vec::Vec<(usize, usize)>,
+    pub(crate) roots: *mut u8,
 }
 
 impl ConservativeTracer {
     pub fn add(&self, start: *mut *mut u8, end: *mut *mut u8) {
         unsafe {
-            (&mut *self.roots).push((start as usize, end as usize));
+            (&mut *(self.roots as *mut alloc::vec::Vec<(usize, usize)>))
+                .push((start as usize, end as usize));
         }
     }
 }

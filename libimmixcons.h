@@ -42,11 +42,20 @@
 #define GC_STATE_SAFE 2
 #endif
 
+typedef struct Option_CollectRootsCallback Option_CollectRootsCallback;
+
 typedef struct TracerPtr {
   uintptr_t tracer[2];
 } TracerPtr;
 
-typedef void (*CollectRootsCallback)(uint8_t *data, struct TracerPtr tracer);
+/**
+ * ConservativeTracer is passed into GC callback so users of this library can also provide some region of memory for conservative scan.
+ */
+typedef struct ConservativeTracer {
+  uint8_t *roots;
+} ConservativeTracer;
+
+typedef void (*CollectRootsCallback)(uint8_t *data, struct TracerPtr tracer, struct ConservativeTracer cons_tracer);
 
 /**
  * Main type used for object tracing,finalization and allocation.
@@ -97,9 +106,17 @@ typedef struct RawGc {
 } RawGc;
 
 /**
+ * Register callback that will be invoked when GC starts.
+ *
+ *
+ * WARNING: There is no way to "unregister" this callback.
+ */
+void immix_register_ongc_callback(CollectRootsCallback callback, uint8_t *data);
+
+/**
  * no-op callback. This is used in place of `CollectRootsCallback` internally
  */
-void immix_noop_callback(uint8_t*, struct TracerPtr);
+void immix_noop_callback(uint8_t*, struct TracerPtr, struct ConservativeTracer);
 
 /**
  * no-op callback for object visitor. Use this if your object does not have any pointers.
@@ -113,13 +130,13 @@ void immix_noop_visit(uint8_t*, struct TracerPtr);
  * - `dummy_sp`: must be pointer to stack variable for searching roots in stack.
  * - `heap_size`: Maximum heap size. If this parameter is less than 512KB then it is set to 512KB.
  * - `threshold`: GC threshold. if zero set to 30% of `heap_size` parameter.
- * - `callback`: GC invokes this callback when collecting roots. You can use this to collect roots inside your VM.
- * - `data`: Data passed to `callback`.
+ * - `callback`(Optional,might be null): GC invokes this callback when collecting roots. You can use this to collect roots inside your VM.
+ * - `data`(Optional,might be null): Data passed to `callback`.
  */
 void immix_init(uintptr_t *dummy_sp,
                 uintptr_t heap_size,
                 uintptr_t threshold,
-                CollectRootsCallback callback,
+                struct Option_CollectRootsCallback callback,
                 uint8_t *data);
 
 /**
@@ -149,6 +166,11 @@ struct GCObject *immix_alloc(uintptr_t size,
 void immix_collect(bool move_objects);
 
 void tracer_trace(struct TracerPtr p, struct RawGc **gc_val);
+
+/**
+ * Add memory region from `begin` to `end` for scanning for heap objects.
+ */
+void conservative_roots_add(struct ConservativeTracer *tracer, uintptr_t begin, uintptr_t end);
 
 #if defined(IMMIX_THREADED)
 void immix_prepare_thread(uintptr_t *sp);
@@ -194,6 +216,41 @@ void immix_register_thread(uintptr_t *sp);
 void immix_unregister_thread(void);
 #endif
 
+#if defined(IMMIX_THREADED)
+/**
+ * Enter unsafe GC state. This means current thread runs "managed by GC code" and GC *must* stop this thread
+ * at GC cycle.
+ *
+ * Returns current state to restore later.
+ */
+int8_t immix_unsafe_enter(void);
+#endif
+
+#if defined(IMMIX_THREADED)
+/**
+ * Leave unsafe GC state and restore previous state from `state` argument. This function has yieldpoint internally so thread
+ * might be suspended for GC.
+ */
+int8_t immix_unsafe_leave(int8_t state);
+#endif
+
+#if defined(IMMIX_THREADED)
+/**
+ * Enter safe for GC state. When thread is in safe state it is allowed to execute code at the same time with the GC.
+ *
+ *
+ * Returns current state to restore later.
+ */
+int8_t immix_safe_enter(void);
+#endif
+
+#if defined(IMMIX_THREADED)
+/**
+ * Leave safe for GC state and restore previous state from `state` argument.
+ */
+int8_t immix_safe_leave(int8_t state);
+#endif
+
 #if !defined(IMMIX_THREADED)
 /**
  * Registers main thread.
@@ -232,4 +289,39 @@ void immix_unregister_thread(void);
  * this will emit volatile load without any conditional jumps so it is very small overhead compared to conditional yieldpoints.
  */
 void immix_mutator_yieldpoint(void);
+#endif
+
+#if !defined(IMMIX_THREADED)
+/**
+ * Enter unsafe GC state. This means current thread runs "managed by GC code" and GC *must* stop this thread
+ * at GC cycle.
+ *
+ * Returns current state to restore later.
+ */
+int8_t immix_unsafe_enter(void);
+#endif
+
+#if !defined(IMMIX_THREADED)
+/**
+ * Leave unsafe GC state and restore previous state from `state` argument. This function has yieldpoint internally so thread
+ * might be suspended for GC.
+ */
+int8_t immix_unsafe_leave(int8_t state);
+#endif
+
+#if !defined(IMMIX_THREADED)
+/**
+ * Enter safe for GC state. When thread is in safe state it is allowed to execute code at the same time with the GC.
+ *
+ *
+ * Returns current state to restore later.
+ */
+int8_t immix_safe_enter(void);
+#endif
+
+#if !defined(IMMIX_THREADED)
+/**
+ * Leave safe for GC state and restore previous state from `state` argument.
+ */
+int8_t immix_safe_leave(int8_t state);
 #endif
