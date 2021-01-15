@@ -42,8 +42,8 @@ macro_rules! make_rtti_for {
             }),
             needs_finalization: false,
             heap_size: {
-                extern "C" fn size(_: *mut u8) -> usize {
-                    core::mem::size_of::<$t>()
+                extern "C" fn size(data: *mut u8) -> usize {
+                    unsafe { (*data.add(8).cast::<$t>()).heap_size() }
                 }
                 size
             },
@@ -74,8 +74,8 @@ macro_rules! make_rtti_for {
             }),
             needs_finalization: true,
             heap_size: {
-                extern "C" fn size(_: *mut u8) -> usize {
-                    core::mem::size_of::<$t>()
+                extern "C" fn size(data: *mut u8) -> usize {
+                    unsafe { (*data.add(8).cast::<$t>()).heap_size() }
                 }
                 size
             },

@@ -112,14 +112,15 @@ mod sync {
     ///
     #[no_mangle]
     pub extern "C" fn immix_register_main_thread(dummy_sp: *mut u8) {
-        #[cfg(test)]
+        immix_register_thread(dummy_sp.cast());
+        /*#[cfg(test)]
         {
             if HAS_MAIN.load(Ordering::Relaxed) == 1 {
                 return;
             }
         }
         assert!(
-            HAS_MAIN.load(Ordering::Relaxed) != 0,
+            HAS_MAIN.load(Ordering::Relaxed) == 1,
             "main thread already registered"
         );
 
@@ -129,7 +130,7 @@ mod sync {
         immix_prepare_thread(dummy_sp.cast());
         immix_get_tls_state().stack_bottom = dummy_sp;
         //let tls = get_tls_state() as *mut _;
-        lock.push(immix_get_tls_state() as *mut _);
+        lock.push(immix_get_tls_state() as *mut _);*/
     }
     /// Register thread.
     /// ## Inputs

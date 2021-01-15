@@ -125,11 +125,13 @@ version = "0.1.0"
 dependencies = [
  "atomic",
  "errno",
+ "instant",
  "libc",
  "log",
  "memmap",
  "once_cell",
  "parking_lot",
+ "parking_lot_core",
  "simple_logger",
  "vec_map",
  "winapi",

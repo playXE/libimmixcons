@@ -41,7 +41,7 @@ fn main() {
         cmd.args(&["--build", ".", "--config", "Release"])
     });
 
-    let mut libpath = PathBuf::from(&boehm_src);
+    let libpath = PathBuf::from(&boehm_src);
     //libpath.push(BOEHM_DIR);
     println!(
         "cargo:rustc=flags=-L{}",

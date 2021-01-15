@@ -127,6 +127,23 @@ fn criterion_bench(c: &mut Criterion) {
     let mut heap = Heap::new();
 
     c.bench_function("bdwgc", |b| b.iter(|| gcbench(&mut heap)));
+    let mut group = c.benchmark_group("threaded");
+    group.sample_size(10);
+    /*group.bench_function("bdwgc", |b| {
+        b.iter(|| {
+            let mut threads = Vec::with_capacity(4);
+            for _ in 0..2 {
+                threads.push(std::thread::spawn(move || {
+                    let mut heap = heap;
+                    gcbench(&mut heap);
+                }));
+            }
+
+            while let Some(th) = threads.pop() {
+                th.join().unwrap();
+            }
+        });
+    });*/
 }
 criterion_group!(benches, criterion_bench);
 criterion_main!(benches);

@@ -1,7 +1,7 @@
 #![allow(dead_code, non_snake_case, unused_variables, non_upper_case_globals)]
 use criterion::{criterion_group, criterion_main, Criterion};
 use libimmixcons::{object::*, *};
-use threading::immix_register_thread;
+use threading::{immix_mutator_yieldpoint, immix_register_thread, immix_unregister_thread};
 pub struct Node {
     left: Option<Gc<Self>>,
     right: Option<Gc<Self>>,
@@ -29,6 +29,7 @@ fn NumIters(i: i32) -> i32 {
     2 * TreeSize(kStretchTreeDepth) / TreeSize(i)
 }
 fn Populate(idepth: i32, thisnode: &mut Gc<Node>) {
+    immix_mutator_yieldpoint();
     if idepth <= 0 {
         return;
     }
@@ -49,6 +50,7 @@ fn Populate(idepth: i32, thisnode: &mut Gc<Node>) {
 }
 
 fn MakeTree(idepth: i32) -> Gc<Node> {
+    immix_mutator_yieldpoint();
     if idepth <= 0 {
         return immix_alloc_safe(Node {
             left: None,
@@ -96,6 +98,7 @@ const kMaxTreeDepth: i32 = 16;
 struct Array {
     value: [f64; kArraySize as usize],
 }
+#[inline(never)]
 fn gcbench() {
     /*simple_logger::SimpleLogger::new()
     .with_level(log::LevelFilter::Debug)
@@ -124,6 +127,7 @@ fn gcbench() {
     while d <= kMaxTreeDepth {
         TimeConstruction(d);
         d += 2;
+        immix_mutator_yieldpoint();
     }
     /*println!(
         "GC bench finished\n  GC threshold is now: {}\n GC cycles happened: {}",
@@ -135,7 +139,13 @@ fn gcbench() {
 
 fn criterion_bench(c: &mut Criterion) {
     let mut sp = 0;
-    immix_init(&mut sp, 2 * 1024 * 1024 * 1024, 0, None, 0 as *mut _);
+    immix_init(
+        &mut sp,
+        2 * 1024 * 1024 * 1024,
+        0,
+        immix_noop_callback,
+        0 as *mut _,
+    );
     immix_register_thread(&mut sp as *mut usize);
 
     c.bench_function("libimmixcons (30% threshold)", |b| b.iter(|| gcbench()));

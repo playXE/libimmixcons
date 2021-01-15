@@ -103,14 +103,15 @@ pub struct NormalAllocator {
     /// The blocks with holes to recycle before requesting new blocks..
     recyclable_blocks: Vec<*mut ImmixBlock>,
     #[cfg(feature = "threaded")]
-    recyc_lock: GCSpinLock,
+    recyc_lock: ReentrantMutex,
     #[cfg(feature = "threaded")]
-    unavail_lock: GCSpinLock,
+    unavail_lock: ReentrantMutex,
     /// The current block to allocate from.
     current_block: Option<BlockTuple>,
 }
 
-use gc_spinlock::GCSpinLock;
+#[cfg(feature = "threaded")]
+use locks::mutex::ReentrantMutex;
 
 impl NormalAllocator {
     /// Create a new `NormalAllocator` backed by the given `BlockAllocator`.
@@ -121,9 +122,9 @@ impl NormalAllocator {
             recyclable_blocks: Vec::new(),
             current_block: None,
             #[cfg(feature = "threaded")]
-            recyc_lock: GCSpinLock::new(),
+            recyc_lock: ReentrantMutex::new(),
             #[cfg(feature = "threaded")]
-            unavail_lock: GCSpinLock::new(),
+            unavail_lock: ReentrantMutex::new(),
         }
     }
     /// Set the recyclable blocks.
@@ -234,7 +235,7 @@ pub struct OverflowAllocator {
     /// The global `BlockAllocator` to get new blocks from.
     block_allocator: *mut BlockAllocator,
     #[cfg(feature = "threaded")]
-    unavail_lock: GCSpinLock,
+    unavail_lock: ReentrantMutex,
     /// The exhausted blocks.
     unavailable_blocks: Vec<*mut ImmixBlock>,
 
@@ -247,7 +248,7 @@ impl OverflowAllocator {
     pub fn new(block_allocator: *mut BlockAllocator) -> OverflowAllocator {
         OverflowAllocator {
             #[cfg(feature = "threaded")]
-            unavail_lock: GCSpinLock::new(),
+            unavail_lock: ReentrantMutex::new(),
             block_allocator,
             unavailable_blocks: Vec::new(),
             current_block: None,

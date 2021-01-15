@@ -24,6 +24,7 @@ impl<T> DerefMut for Gc<T> {
     }
 }
 
+#[derive(Copy, Clone)]
 pub struct Heap;
 
 impl Heap {

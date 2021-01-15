@@ -1,3 +1,7 @@
+// building:
+// cbindgen --config cbindgen.toml --crate libimmixcons --output libimmixcons.h
+// clang -L"target/release/" -llibimmixcons example.c
+//
 #define IMMIX_THREADED 1
 #include "libimmixcons.h"
 #include <stdio.h>
@@ -19,7 +23,7 @@ int main()
     immix_init_logger();
     void *sp = (void *)0;
     immix_init((uintptr_t *)(void *)&sp, 0, 0, &immix_noop_callback, 0);
-    immix_register_main_thread((uint8_t *)&sp);
+    immix_register_thread((uintptr_t *)&sp);
     inner_main();
 }
 make_simple_rtti(int);

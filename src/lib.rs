@@ -42,6 +42,8 @@ use alloc::vec::Vec;
 use collector::Collector;
 use large_object_space::PreciseAllocation;
 use libc::malloc;
+#[cfg(feature = "threaded")]
+use locks::mutex::Mutex;
 use object::*;
 use object::{RawGc, TracerPtr};
 #[cfg(feature = "threaded")]
@@ -65,7 +67,7 @@ pub struct Immix {
     collector: Collector,
     to_finalize: LinkedList<*mut RawGc>,
     #[cfg(feature = "threaded")]
-    fin_lock: parking_lot::RawMutex,
+    fin_lock: Mutex,
 }
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum CollectionType {
@@ -293,7 +295,7 @@ impl Immix {
 
             to_finalize: LinkedList::new(),
             #[cfg(feature = "threaded")]
-            fin_lock: parking_lot::RawMutex::INIT,
+            fin_lock: Mutex::new(),
             collector: Collector::new(),
         }
     }

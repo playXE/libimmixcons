@@ -1,6 +1,8 @@
 use super::block::ImmixBlock;
 use super::constants::*;
-use crate::util::{gc_spinlock::GCSpinLock, Address};
+#[cfg(feature = "threaded")]
+use crate::util::locks::mutex::ReentrantMutex;
+use crate::util::Address;
 #[cfg(windows)]
 mod _win {
     use super::*;
@@ -139,7 +141,7 @@ use core::sync::atomic::Ordering;
 
 pub struct BlockAllocator {
     #[cfg(feature = "threaded")]
-    lock: GCSpinLock,
+    lock: ReentrantMutex,
     free_blocks: alloc::vec::Vec<*mut ImmixBlock>,
 
     //pub bitmap: SpaceBitmap<16>,
@@ -162,7 +164,7 @@ impl BlockAllocator {
         );
         let this = Self {
             #[cfg(feature = "threaded")]
-            lock: GCSpinLock::new(),
+            lock: ReentrantMutex::new(),
             data: map.aligned(),
             data_bound: map.end(),
             free_blocks: alloc::vec::Vec::new(),

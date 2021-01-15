@@ -504,7 +504,7 @@ pub unsafe fn zeroed<T>() -> T {
 }
 use core::cell::UnsafeCell;
 use core::ptr;
-pub mod gc_spinlock;
+pub mod locks;
 /// Just like [`Cell`] but with [volatile] read / write operations
 ///
 /// [`Cell`]: https://doc.rust-lang.org/std/cell/struct.Cell.html
