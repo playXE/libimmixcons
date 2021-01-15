@@ -1,7 +1,7 @@
 #![allow(dead_code, non_snake_case, unused_variables, non_upper_case_globals)]
 use criterion::{criterion_group, criterion_main, Criterion};
 use libimmixcons::{object::*, *};
-use threading::immix_register_main_thread;
+use threading::immix_register_thread;
 pub struct Node {
     left: Option<Gc<Self>>,
     right: Option<Gc<Self>>,
@@ -135,14 +135,8 @@ fn gcbench() {
 
 fn criterion_bench(c: &mut Criterion) {
     let mut sp = 0;
-    immix_init(
-        &mut sp,
-        2 * 1024 * 1024 * 1024,
-        0,
-        immix_noop_callback,
-        0 as *mut _,
-    );
-    immix_register_main_thread(&mut sp as *mut usize as *mut u8);
+    immix_init(&mut sp, 2 * 1024 * 1024 * 1024, 0, None, 0 as *mut _);
+    immix_register_thread(&mut sp as *mut usize);
 
     c.bench_function("libimmixcons (30% threshold)", |b| b.iter(|| gcbench()));
 }
