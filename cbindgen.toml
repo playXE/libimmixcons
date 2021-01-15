@@ -1,0 +1,4 @@
+language = "C"
+
+[defines]
+"feature = threaded" = "IMMIX_THREADED"
