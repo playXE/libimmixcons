@@ -332,7 +332,7 @@ pub extern "C" fn immix_init(
     dummy_sp: *mut usize,
     mut heap_size: usize,
     mut threshold: usize,
-    callback: Option<CollectRootsCallback>,
+    callback: CollectRootsCallback,
     data: *mut u8,
 ) {
     unsafe {
@@ -348,9 +348,8 @@ pub extern "C" fn immix_init(
                 threshold = ((30.0 * heap_size as f64) / 100.0).floor() as usize;
             }
             let mut space = Immix::new(heap_size, threshold);
-            if let Some(callback) = callback {
-                space.collect_roots_callback.push((callback, data));
-            }
+
+            space.collect_roots_callback.push((callback, data));
             space.stack_bottom = dummy_sp as *mut u8;
             signals::install_default_signal_handlers();
             #[cfg(feature = "threaded")]

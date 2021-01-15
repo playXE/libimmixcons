@@ -1,5 +1,5 @@
 use crate::{
-    immix_alloc_safe, immix_collect, immix_init, immix_init_logger,
+    immix_alloc_safe, immix_collect, immix_init, immix_init_logger, immix_noop_callback,
     object::Gc,
     threading::{immix_mutator_yieldpoint, immix_register_thread, immix_unregister_thread},
 };
@@ -16,7 +16,13 @@ fn init() {
 fn simple() {
     init();
     let mut sp = 0;
-    immix_init(&mut sp, 2 * 1024 * 1024 * 1024, 0, None, 0 as *mut _);
+    immix_init(
+        &mut sp,
+        2 * 1024 * 1024 * 1024,
+        0,
+        immix_noop_callback,
+        0 as *mut _,
+    );
     immix_register_thread(&mut sp);
     immix_mutator_yieldpoint();
     inner_simple();
@@ -40,7 +46,13 @@ fn smash() {
     init();
 
     let mut sp = 0;
-    immix_init(&mut sp, 2 * 1024 * 1024 * 1024, 0, None, 0 as *mut _);
+    immix_init(
+        &mut sp,
+        2 * 1024 * 1024 * 1024,
+        0,
+        immix_noop_callback,
+        0 as *mut _,
+    );
     //immix_register_thread(&mut sp);
     immix_mutator_yieldpoint();
     inner_smash();
