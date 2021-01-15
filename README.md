@@ -10,11 +10,17 @@ This is mostly usable library. You can use this library inside your programs or 
 - Opportunistic evacuation of fragmented blocks.
 - C API in `libimmixcons.h`. 
 
+# TODO
+- More documentation and more examples.
+- More benchmarks.
+- ~~I want more power!~~ Improve performance as it is not at its peak right now.
+
+
 # Examples
 For examples look in `examples/` directory and for usage of C API take a look at `example.c`.
 
 # Benchmarks
-gcbench results agains BDWGC:
+gcbench results against BDWGC on iMac mid 2011:
 ```
      Running target/release/deps/gcbench_bdwgc-47ada9e692b50c7d
 Gnuplot not found, using plotters backend
