@@ -72,7 +72,7 @@ mod sync {
     }
     #[no_mangle]
     #[inline]
-    pub extern "C" fn immix_get_tls_state() -> &'static mut TLSState {
+    pub(crate) extern "C" fn immix_get_tls_state() -> &'static mut TLSState {
         unsafe { &mut *TLS.get() }
     }
     /// Checks if current thread should yield. GC won't be able to stop a mutator unless this function is put into code.
@@ -222,7 +222,7 @@ mod unsync {
     pub extern "C" fn immix_mutator_yieldpoint() {}
     #[no_mangle]
     #[inline]
-    pub extern "C" fn immix_get_tls_state() -> &'static mut TLSState {
+    pub(crate) extern "C" fn immix_get_tls_state() -> &'static mut TLSState {
         unsafe { &mut *TLS.get() }
     }
     #[inline]

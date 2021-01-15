@@ -1,3 +1,4 @@
+#define IMMIX_THREADED 1
 #include "libimmixcons.h"
 #include <stdio.h>
 #define make_simple_rtti(type)                                               \

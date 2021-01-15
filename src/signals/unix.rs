@@ -5,7 +5,7 @@ use crate::util::*;
 use core::ptr::*;
 use libc::*;
 #[cfg(target_os = "macos")]
-pub const MAP_ANONYMOUS: c_int = MAP_ANON;
+pub(crate) const MAP_ANONYMOUS: c_int = MAP_ANON;
 
 unsafe extern "C" fn sigdie_handler(sig: i32, _info: *mut siginfo_t, _context: *mut c_void) {
     let mut sset = zeroed::<sigset_t>();

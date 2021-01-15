@@ -34,13 +34,13 @@
  */
 #define EVAC_TRIGGER_THRESHHOLD 0.25
 
-#define MAP_ANONYMOUS MAP_ANON
-
+#if defined(IMMIX_THREADED)
 #define GC_STATE_WAITING 1
+#endif
 
+#if defined(IMMIX_THREADED)
 #define GC_STATE_SAFE 2
-
-typedef struct TLSState TLSState;
+#endif
 
 typedef struct TracerPtr {
   uintptr_t tracer[2];
@@ -150,10 +150,11 @@ void immix_collect(bool move_objects);
 
 void tracer_trace(struct TracerPtr p, struct RawGc **gc_val);
 
+#if defined(IMMIX_THREADED)
 void immix_prepare_thread(uintptr_t *sp);
+#endif
 
-struct TLSState *immix_get_tls_state(void);
-
+#if defined(IMMIX_THREADED)
 /**
  * Checks if current thread should yield. GC won't be able to stop a mutator unless this function is put into code.
  *
@@ -162,7 +163,9 @@ struct TLSState *immix_get_tls_state(void);
  * this will emit volatile load without any conditional jumps so it is very small overhead compared to conditional yieldpoints.
  */
 void immix_mutator_yieldpoint(void);
+#endif
 
+#if defined(IMMIX_THREADED)
 /**
  * Registers main thread.
  *
@@ -172,7 +175,9 @@ void immix_mutator_yieldpoint(void);
  *
  */
 void immix_register_main_thread(uint8_t *dummy_sp);
+#endif
 
+#if defined(IMMIX_THREADED)
 /**
  * Register thread.
  * ## Inputs
@@ -180,12 +185,45 @@ void immix_register_main_thread(uint8_t *dummy_sp);
  *
  */
 void immix_register_thread(uintptr_t *sp);
+#endif
 
+#if defined(IMMIX_THREADED)
 /**
  * Unregister thread.
  */
 void immix_unregister_thread(void);
+#endif
 
+#if !defined(IMMIX_THREADED)
+/**
+ * Registers main thread.
+ *
+ * # Panics
+ * Panics if main thread is already registered.
+ *
+ *
+ */
+void immix_register_main_thread(void);
+#endif
+
+#if !defined(IMMIX_THREADED)
+/**
+ * Register thread.
+ * ## Inputs
+ * `sp`: pointer to variable on stack for searching roots on stack.
+ *
+ */
+void immix_register_thread(void);
+#endif
+
+#if !defined(IMMIX_THREADED)
+/**
+ * Unregister thread.
+ */
+void immix_unregister_thread(void);
+#endif
+
+#if !defined(IMMIX_THREADED)
 /**
  * Checks if current thread should yield. GC won't be able to stop a thread unless this function is put into code.
  *
@@ -194,5 +232,4 @@ void immix_unregister_thread(void);
  * this will emit volatile load without any conditional jumps so it is very small overhead compared to conditional yieldpoints.
  */
 void immix_mutator_yieldpoint(void);
-
-struct TLSState *immix_get_tls_state(void);
+#endif
