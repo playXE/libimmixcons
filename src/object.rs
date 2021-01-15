@@ -377,3 +377,10 @@ pub extern "C" fn conservative_roots_add(
 ) {
     unsafe { (&mut *tracer).add(begin as *mut _, end as *mut _) }
 }
+
+impl<T: HeapObject + ?Sized> Copy for Gc<T> {}
+impl<T: HeapObject + ?Sized> Clone for Gc<T> {
+    fn clone(&self) -> Self {
+        *self
+    }
+}

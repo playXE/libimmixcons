@@ -9,7 +9,8 @@
     linked_list_cursors,
     thread_local
 )]
-#![no_std]
+#![cfg_attr(test, feature(const_in_array_repeat_expressions))]
+#![cfg_attr(not(test), no_std)]
 
 #[cfg(feature = "log")]
 #[macro_use]
@@ -46,8 +47,11 @@ use object::{RawGc, TracerPtr};
 #[cfg(feature = "threaded")]
 use parking_lot::lock_api::RawMutex;
 use threading::immix_get_tls_state;
-
 use util::*;
+
+#[cfg(test)]
+mod tests;
+
 pub struct Immix {
     los: LargeObjectSpace,
     immix: *mut ImmixSpace,
@@ -294,7 +298,7 @@ impl Immix {
         }
     }
 }
-
+#[cfg_attr(not(feature = "threaded"), thread_local)]
 static mut SPACE: *mut Immix = 0 as *mut _;
 
 /// Register callback that will be invoked when GC starts.
@@ -332,21 +336,31 @@ pub extern "C" fn immix_init(
     data: *mut u8,
 ) {
     unsafe {
-        if heap_size == 0 || heap_size <= 512 * 1024 {
-            heap_size = 16 * BLOCK_SIZE;
-            threshold = 100 * 1024;
-        } else if threshold == 0 {
-            threshold = ((30.0 * heap_size as f64) / 100.0).floor() as usize;
+        use core::sync::atomic::*;
+        #[cfg_attr(not(feature = "threaded"), thread_local)]
+        static INIT: AtomicBool = AtomicBool::new(false);
+        if INIT.compare_exchange_weak(false, true, Ordering::SeqCst, Ordering::Relaxed) == Ok(false)
+        {
+            if heap_size == 0 || heap_size <= 512 * 1024 {
+                heap_size = 16 * BLOCK_SIZE;
+                threshold = 100 * 1024;
+            } else if threshold == 0 {
+                threshold = ((30.0 * heap_size as f64) / 100.0).floor() as usize;
+            }
+            let mut space = Immix::new(heap_size, threshold);
+            if let Some(callback) = callback {
+                space.collect_roots_callback.push((callback, data));
+            }
+            space.stack_bottom = dummy_sp as *mut u8;
+            signals::install_default_signal_handlers();
+            #[cfg(feature = "threaded")]
+            {
+                safepoint::safepoint_init();
+            }
+            let mem = malloc(core::mem::size_of::<Immix>()).cast::<Immix>();
+            mem.write(space);
+            SPACE = mem;
         }
-        let mut space = Immix::new(heap_size, threshold);
-        if let Some(callback) = callback {
-            space.collect_roots_callback.push((callback, data));
-        }
-        space.stack_bottom = dummy_sp as *mut u8;
-
-        let mem = malloc(core::mem::size_of::<Immix>()).cast::<Immix>();
-        mem.write(space);
-        SPACE = mem;
     }
 }
 
@@ -354,11 +368,15 @@ pub extern "C" fn immix_init(
 #[no_mangle]
 pub extern "C" fn immix_init_logger() {
     #[cfg(feature = "log")]
-    {
-        simple_logger::SimpleLogger::new()
-            .with_level(log::LevelFilter::Debug)
-            .init()
-            .unwrap();
+    unsafe {
+        static mut INIT: bool = false;
+        if !INIT {
+            INIT = true;
+            simple_logger::SimpleLogger::new()
+                .with_level(log::LevelFilter::Debug)
+                .init()
+                .unwrap();
+        }
     }
 }
 #[repr(C)]
@@ -416,3 +434,17 @@ pub(crate) static PAGESIZE: once_cell::sync::Lazy<usize> = once_cell::sync::Lazy
         page_size as _
     }
 });
+
+pub(crate) fn thread_self() -> u64 {
+    #[cfg(windows)]
+    unsafe {
+        extern "C" {
+            fn GetCurrentThreadId() -> u32;
+        }
+        GetCurrentThreadId() as u64
+    }
+    #[cfg(unix)]
+    unsafe {
+        libc::pthread_self() as u64
+    }
+}

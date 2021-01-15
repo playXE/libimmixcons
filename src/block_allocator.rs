@@ -1,6 +1,6 @@
 use super::block::ImmixBlock;
 use super::constants::*;
-use crate::util::Address;
+use crate::util::{gc_spinlock::GCSpinLock, Address};
 #[cfg(windows)]
 mod _win {
     use super::*;
@@ -136,11 +136,10 @@ pub use _unix::*;
 #[cfg(windows)]
 pub use _win::*;
 use core::sync::atomic::Ordering;
-#[cfg(feature = "threaded")]
-use parking_lot::lock_api::RawMutex;
+
 pub struct BlockAllocator {
     #[cfg(feature = "threaded")]
-    lock: parking_lot::RawMutex,
+    lock: GCSpinLock,
     free_blocks: alloc::vec::Vec<*mut ImmixBlock>,
 
     //pub bitmap: SpaceBitmap<16>,
@@ -163,7 +162,7 @@ impl BlockAllocator {
         );
         let this = Self {
             #[cfg(feature = "threaded")]
-            lock: parking_lot::RawMutex::INIT,
+            lock: GCSpinLock::new(),
             data: map.aligned(),
             data_bound: map.end(),
             free_blocks: alloc::vec::Vec::new(),
@@ -193,7 +192,7 @@ impl BlockAllocator {
             .or_else(|| self.build_block());
         #[cfg(feature = "threaded")]
         {
-            unsafe { self.lock.unlock() };
+            self.lock.unlock();
         }
         block
     }
@@ -228,7 +227,7 @@ impl BlockAllocator {
     pub fn return_blocks(&mut self, blocks: impl IntoIterator<Item = *mut ImmixBlock>) {
         #[cfg(feature = "threaded")]
         {
-            self.lock.lock();
+            self.lock.lock_nogc();
         }
         let iter = blocks.into_iter();
 
@@ -237,7 +236,7 @@ impl BlockAllocator {
             self.free_blocks.push(block);
         });
         #[cfg(feature = "threaded")]
-        unsafe {
+        {
             self.lock.unlock()
         }
     }

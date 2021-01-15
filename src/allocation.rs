@@ -103,15 +103,15 @@ pub struct NormalAllocator {
     /// The blocks with holes to recycle before requesting new blocks..
     recyclable_blocks: Vec<*mut ImmixBlock>,
     #[cfg(feature = "threaded")]
-    recyc_lock: parking_lot::RawMutex,
+    recyc_lock: GCSpinLock,
     #[cfg(feature = "threaded")]
-    unavail_lock: parking_lot::RawMutex,
+    unavail_lock: GCSpinLock,
     /// The current block to allocate from.
     current_block: Option<BlockTuple>,
 }
 
-#[cfg(feature = "threaded")]
-use parking_lot::lock_api::RawMutex;
+use gc_spinlock::GCSpinLock;
+
 impl NormalAllocator {
     /// Create a new `NormalAllocator` backed by the given `BlockAllocator`.
     pub fn new(block_allocator: *mut BlockAllocator) -> NormalAllocator {
@@ -121,9 +121,9 @@ impl NormalAllocator {
             recyclable_blocks: Vec::new(),
             current_block: None,
             #[cfg(feature = "threaded")]
-            recyc_lock: parking_lot::RawMutex::INIT,
+            recyc_lock: GCSpinLock::new(),
             #[cfg(feature = "threaded")]
-            unavail_lock: parking_lot::RawMutex::INIT,
+            unavail_lock: GCSpinLock::new(),
         }
     }
     /// Set the recyclable blocks.
@@ -187,14 +187,14 @@ impl Allocator for NormalAllocator {
             match self.recyclable_blocks.pop() {
                 None => {
                     #[cfg(feature = "threaded")]
-                    unsafe {
+                    {
                         self.recyc_lock.unlock();
                     }
                     None
                 }
                 Some(block) => {
                     #[cfg(feature = "threaded")]
-                    unsafe {
+                    {
                         self.recyc_lock.unlock();
                     }
                     match unsafe { (*block).scan_block((size_of::<ImmixBlock>() - 1) as u16) } {
@@ -221,7 +221,7 @@ impl Allocator for NormalAllocator {
         }
         self.unavailable_blocks.push(block);
         #[cfg(feature = "threaded")]
-        unsafe {
+        {
             self.unavail_lock.unlock();
         }
     }
@@ -233,7 +233,8 @@ impl Allocator for NormalAllocator {
 pub struct OverflowAllocator {
     /// The global `BlockAllocator` to get new blocks from.
     block_allocator: *mut BlockAllocator,
-
+    #[cfg(feature = "threaded")]
+    unavail_lock: GCSpinLock,
     /// The exhausted blocks.
     unavailable_blocks: Vec<*mut ImmixBlock>,
 
@@ -245,6 +246,8 @@ impl OverflowAllocator {
     /// Create a new `OverflowAllocator` backed by the given `BlockAllocator`.
     pub fn new(block_allocator: *mut BlockAllocator) -> OverflowAllocator {
         OverflowAllocator {
+            #[cfg(feature = "threaded")]
+            unavail_lock: GCSpinLock::new(),
             block_allocator,
             unavailable_blocks: Vec::new(),
             current_block: None,
@@ -302,7 +305,15 @@ impl Allocator for OverflowAllocator {
     }
 
     fn handle_full_block(&mut self, block: *mut ImmixBlock) {
+        #[cfg(feature = "threaded")]
+        {
+            self.unavail_lock.lock();
+        }
         self.unavailable_blocks.push(block);
+        #[cfg(feature = "threaded")]
+        {
+            self.unavail_lock.unlock();
+        }
     }
 }
 /// The `EvacAllocator` is used during the opportunistic evacuation in the

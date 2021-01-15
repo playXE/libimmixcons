@@ -30,4 +30,4 @@ threaded = ["parking_lot", "atomic"]
 
 [lib]
 name = "libimmixcons"
-crate-type = ["cdylib", "rlib"]
+crate-type = ["cdylib", "rlib", "staticlib"]

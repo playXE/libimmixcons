@@ -260,7 +260,7 @@ int8_t immix_safe_leave(int8_t state);
  *
  *
  */
-void immix_register_main_thread(void);
+void immix_register_main_thread(uint8_t*);
 #endif
 
 #if !defined(IMMIX_THREADED)
@@ -270,7 +270,7 @@ void immix_register_main_thread(void);
  * `sp`: pointer to variable on stack for searching roots on stack.
  *
  */
-void immix_register_thread(void);
+void immix_register_thread(uintptr_t*);
 #endif
 
 #if !defined(IMMIX_THREADED)

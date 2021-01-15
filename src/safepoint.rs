@@ -119,7 +119,7 @@ pub fn safepoint_wait_for_the_world(
         }
 
         let ptls = unsafe { &**th };
-        //println!("wait on {:p}", ptls);
+        debug!("wait on {:p}", ptls);
         while ptls.atomic_gc_state().load(Ordering::Relaxed) == 0
             || ptls.atomic_gc_state().load(Ordering::Acquire) == 0
         {

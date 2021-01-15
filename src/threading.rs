@@ -87,9 +87,7 @@ mod sync {
     }
     use alloc::vec::Vec;
 
-    use crate::{
-        allocation::BlockTuple, safepoint::safepoint_init, signals::install_default_signal_handlers,
-    };
+    use crate::allocation::BlockTuple;
     pub struct Threads {
         pub threads: Mutex<Vec<*mut TLSState>>,
     }
@@ -114,15 +112,19 @@ mod sync {
     ///
     #[no_mangle]
     pub extern "C" fn immix_register_main_thread(dummy_sp: *mut u8) {
+        #[cfg(test)]
+        {
+            if HAS_MAIN.load(Ordering::Relaxed) == 1 {
+                return;
+            }
+        }
         assert!(
-            HAS_MAIN.load(Ordering::Relaxed) != 1,
+            HAS_MAIN.load(Ordering::Relaxed) != 0,
             "main thread already registered"
         );
-        unsafe {
-            safepoint_init();
-        }
 
-        install_default_signal_handlers();
+        HAS_MAIN.store(1, Ordering::Release);
+
         let mut lock = THREADS.threads.lock();
         immix_prepare_thread(dummy_sp.cast());
         immix_get_tls_state().stack_bottom = dummy_sp;
@@ -197,7 +199,7 @@ mod unsync {
     ///
     ///
     #[no_mangle]
-    pub extern "C" fn immix_register_main_thread() {
+    pub extern "C" fn immix_register_main_thread(_: *mut u8) {
         /* no-op */
     }
     /// Register thread.
@@ -205,13 +207,17 @@ mod unsync {
     /// `sp`: pointer to variable on stack for searching roots on stack.
     ///
     #[no_mangle]
-    pub extern "C" fn immix_register_thread() {
+    pub extern "C" fn immix_register_thread(_: *mut usize) {
         /* no-op */
     }
     /// Unregister thread.
     #[no_mangle]
     pub extern "C" fn immix_unregister_thread() {
         /* no-op */
+        unsafe {
+            core::ptr::drop_in_place(crate::SPACE);
+            libc::free(crate::SPACE as *mut _);
+        }
     }
     use core::cell::UnsafeCell;
     static mut TLS: UnsafeCell<TLSState> = UnsafeCell::new(TLSState);
