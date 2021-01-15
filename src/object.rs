@@ -353,3 +353,25 @@ pub struct GCRTTI {
     /// Object finalizer. Invoked when object is dead.
     pub finalizer: Option<extern "C" fn(*mut u8)>,
 }
+
+/// ConservativeTracer is passed into GC callback so users of this library can also provide some region of memory for conservative scan.
+pub struct ConservativeTracer {
+    pub roots: *mut alloc::vec::Vec<(usize, usize)>,
+}
+
+impl ConservativeTracer {
+    pub fn add(&self, start: *mut *mut u8, end: *mut *mut u8) {
+        unsafe {
+            (&mut *self.roots).push((start as usize, end as usize));
+        }
+    }
+}
+/// Add memory region from `begin` to `end` for scanning for heap objects.
+#[no_mangle]
+pub extern "C" fn conservative_roots_add(
+    tracer: *mut ConservativeTracer,
+    begin: usize,
+    end: usize,
+) {
+    unsafe { (&mut *tracer).add(begin as *mut _, end as *mut _) }
+}

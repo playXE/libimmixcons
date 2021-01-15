@@ -103,7 +103,7 @@ impl ImmixCollector {
 use alloc::vec::Vec;
 
 pub struct Collector {
-    all_blocks: Vec<*mut ImmixBlock, LibcAlloc>,
+    all_blocks: Vec<*mut ImmixBlock>,
     mark_histogram: VecMap<usize>,
 }
 impl Default for Collector {
@@ -114,7 +114,7 @@ impl Default for Collector {
 impl Collector {
     pub fn new() -> Self {
         Self {
-            all_blocks: Vec::new_in(LibcAlloc),
+            all_blocks: Vec::new(),
             mark_histogram: VecMap::with_capacity(NUM_LINES_PER_BLOCK),
         }
     }
@@ -223,15 +223,10 @@ impl Collector {
     ///
     /// This function returns a list of recyclable blocks and a list of free
     /// blocks.
-    fn sweep_all_blocks(
-        &mut self,
-    ) -> (
-        Vec<*mut ImmixBlock, LibcAlloc>,
-        Vec<*mut ImmixBlock, LibcAlloc>,
-    ) {
-        let mut unavailable_blocks = Vec::new_in(LibcAlloc);
-        let mut recyclable_blocks = Vec::new_in(LibcAlloc);
-        let mut free_blocks = Vec::new_in(LibcAlloc);
+    fn sweep_all_blocks(&mut self) -> (Vec<*mut ImmixBlock>, Vec<*mut ImmixBlock>) {
+        let mut unavailable_blocks = Vec::new();
+        let mut recyclable_blocks = Vec::new();
+        let mut free_blocks = Vec::new();
         for block in self.all_blocks.drain(..) {
             if unsafe { (*block).is_empty() } {
                 unsafe {

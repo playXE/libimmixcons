@@ -2,8 +2,8 @@ use super::block::ImmixBlock;
 use super::block_allocator::BlockAllocator;
 use super::constants::*;
 use super::space_bitmap::SpaceBitmap;
+use crate::util::*;
 use crate::{object::*, threading::immix_get_tls_state};
-use crate::{util::LibcAlloc, util::*};
 use core::{mem::size_of, ptr::null_mut};
 /// A type alias for the block, the current low and high offset.
 pub type BlockTuple = (*mut ImmixBlock, u16, u16);
@@ -14,7 +14,7 @@ pub type BlockTuple = (*mut ImmixBlock, u16, u16);
 pub trait Allocator {
     /// Get all block managed by the allocator, draining any local
     /// collections.
-    fn get_all_blocks(&mut self) -> alloc::vec::Vec<*mut ImmixBlock, LibcAlloc>;
+    fn get_all_blocks(&mut self) -> alloc::vec::Vec<*mut ImmixBlock>;
 
     /// Get the current block to allocate from.
     fn take_current_block(&mut self) -> Option<BlockTuple>;
@@ -98,10 +98,10 @@ pub struct NormalAllocator {
     block_allocator: *mut BlockAllocator,
 
     /// The exhausted blocks.
-    unavailable_blocks: Vec<*mut ImmixBlock, LibcAlloc>,
+    unavailable_blocks: Vec<*mut ImmixBlock>,
 
     /// The blocks with holes to recycle before requesting new blocks..
-    recyclable_blocks: Vec<*mut ImmixBlock, LibcAlloc>,
+    recyclable_blocks: Vec<*mut ImmixBlock>,
     #[cfg(feature = "threaded")]
     recyc_lock: parking_lot::RawMutex,
     #[cfg(feature = "threaded")]
@@ -117,8 +117,8 @@ impl NormalAllocator {
     pub fn new(block_allocator: *mut BlockAllocator) -> NormalAllocator {
         NormalAllocator {
             block_allocator,
-            unavailable_blocks: Vec::new_in(LibcAlloc),
-            recyclable_blocks: Vec::new_in(LibcAlloc),
+            unavailable_blocks: Vec::new(),
+            recyclable_blocks: Vec::new(),
             current_block: None,
             #[cfg(feature = "threaded")]
             recyc_lock: parking_lot::RawMutex::INIT,
@@ -127,14 +127,14 @@ impl NormalAllocator {
         }
     }
     /// Set the recyclable blocks.
-    pub fn set_recyclable_blocks(&mut self, blocks: Vec<*mut ImmixBlock, LibcAlloc>) {
+    pub fn set_recyclable_blocks(&mut self, blocks: Vec<*mut ImmixBlock>) {
         self.recyclable_blocks = blocks;
     }
 }
 
 impl Allocator for NormalAllocator {
-    fn get_all_blocks(&mut self) -> Vec<*mut ImmixBlock, LibcAlloc> {
-        let mut blocks = Vec::new_in(LibcAlloc);
+    fn get_all_blocks(&mut self) -> Vec<*mut ImmixBlock> {
+        let mut blocks = Vec::new();
         for block in self
             .unavailable_blocks
             .drain(..)
@@ -253,8 +253,8 @@ impl OverflowAllocator {
 }
 
 impl Allocator for OverflowAllocator {
-    fn get_all_blocks(&mut self) -> Vec<*mut ImmixBlock, LibcAlloc> {
-        let mut blocks = Vec::new_in(LibcAlloc);
+    fn get_all_blocks(&mut self) -> Vec<*mut ImmixBlock> {
+        let mut blocks = Vec::new();
         for block in self
             .unavailable_blocks
             .drain(..)
@@ -345,8 +345,8 @@ impl EvacAllocator {
 }
 
 impl Allocator for EvacAllocator {
-    fn get_all_blocks(&mut self) -> Vec<*mut ImmixBlock, LibcAlloc> {
-        let mut blocks = Vec::new_in(LibcAlloc);
+    fn get_all_blocks(&mut self) -> Vec<*mut ImmixBlock> {
+        let mut blocks = Vec::new();
         for block in self
             .unavailable_blocks
             .drain(..)
@@ -468,7 +468,7 @@ impl ImmixSpace {
     }
 
     /// Set the recyclable blocks for the `NormalAllocator`.
-    pub fn set_recyclable_blocks(&mut self, blocks: Vec<*mut ImmixBlock, LibcAlloc>) {
+    pub fn set_recyclable_blocks(&mut self, blocks: Vec<*mut ImmixBlock>) {
         self.allocator.set_recyclable_blocks(blocks);
     }
 

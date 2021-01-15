@@ -1,4 +1,4 @@
-use crate::{threading::*, util::LibcAlloc};
+use crate::threading::*;
 use core::sync::atomic::{AtomicBool, Ordering};
 use libc::*;
 use parking_lot::Mutex;
@@ -107,7 +107,7 @@ pub fn safepoint_start_gc() -> bool {
 }
 
 pub fn safepoint_wait_for_the_world(
-) -> parking_lot::MutexGuard<'static, alloc::vec::Vec<*mut TLSState, LibcAlloc>> {
+) -> parking_lot::MutexGuard<'static, alloc::vec::Vec<*mut TLSState>> {
     let threads = &*THREADS;
     let ctls = immix_get_tls_state() as *mut _;
     //panic!();

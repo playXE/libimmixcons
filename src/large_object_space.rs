@@ -191,7 +191,7 @@ pub fn is_aligned_for_precise_allocation(mem: *mut u8) -> bool {
 /// Each object gets its own malloc'd region of memory.
 /// Large objects are never moved by the garbage collector.
 pub struct LargeObjectSpace {
-    allocations: alloc::vec::Vec<*mut PreciseAllocation, LibcAlloc>,
+    allocations: alloc::vec::Vec<*mut PreciseAllocation>,
     pub(crate) current_live_mark: bool,
 }
 
@@ -205,7 +205,7 @@ impl LargeObjectSpace {
     pub fn new() -> Self {
         Self {
             current_live_mark: false,
-            allocations: alloc::vec::Vec::with_capacity_in(8, LibcAlloc),
+            allocations: alloc::vec::Vec::with_capacity(8),
         }
     }
     pub fn sweep(&mut self) -> usize {

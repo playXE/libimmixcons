@@ -23,7 +23,7 @@ impl Drop for Simple {
 fn main() {
     immix_init_logger();
     let mut sp = 0;
-    immix_init(&mut sp, 0, 0, immix_noop_callback, 0 as *mut _);
+    immix_init(&mut sp, 0, 0, Some(immix_noop_callback), 0 as *mut _);
     immix_register_main_thread(&mut sp as *mut usize as *mut u8);
     {
         let p = immix_alloc_safe(42);

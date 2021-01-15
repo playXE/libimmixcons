@@ -88,17 +88,16 @@ mod sync {
     use alloc::vec::Vec;
 
     use crate::{
-        allocation::BlockTuple, safepoint::safepoint_init,
-        signals::install_default_signal_handlers, util::LibcAlloc,
+        allocation::BlockTuple, safepoint::safepoint_init, signals::install_default_signal_handlers,
     };
     pub struct Threads {
-        pub threads: Mutex<Vec<*mut TLSState, LibcAlloc>>,
+        pub threads: Mutex<Vec<*mut TLSState>>,
     }
 
     impl Threads {
         pub fn new() -> Self {
             Self {
-                threads: Mutex::new(Vec::with_capacity_in(2, LibcAlloc)),
+                threads: Mutex::new(Vec::with_capacity(2)),
             }
         }
     }

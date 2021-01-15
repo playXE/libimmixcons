@@ -46,7 +46,7 @@ use object::{RawGc, TracerPtr};
 #[cfg(feature = "threaded")]
 use parking_lot::lock_api::RawMutex;
 use threading::immix_get_tls_state;
-use util::LibcAlloc;
+
 use util::*;
 pub struct Immix {
     los: LargeObjectSpace,
@@ -56,8 +56,8 @@ pub struct Immix {
     allocated: usize,
     threshold: usize,
     current_live_mark: bool,
-    collect_roots_callback: Option<CollectRootsCallback>,
-    data: *mut u8,
+    collect_roots_callback: Vec<(CollectRootsCallback, *mut u8)>,
+
     collector: Collector,
     to_finalize: LinkedList<*mut RawGc>,
     #[cfg(feature = "threaded")]
@@ -69,7 +69,8 @@ pub enum CollectionType {
     ImmixEvacCollection,
 }
 
-pub type CollectRootsCallback = extern "C" fn(data: *mut u8, tracer: TracerPtr);
+pub type CollectRootsCallback =
+    extern "C" fn(data: *mut u8, tracer: TracerPtr, cons_tracer: ConservativeTracer);
 
 impl Immix {
     #[inline(never)]
@@ -89,10 +90,11 @@ impl Immix {
                 threads = ();
             }
 
-            let mut precise_roots = Vec::new_in(LibcAlloc);
-            if let Some(callback) = self.collect_roots_callback {
+            let mut precise_roots = Vec::new();
+            let mut cons = Vec::new();
+            for &(callback, data) in self.collect_roots_callback.iter() {
                 struct VisitRoots {
-                    v: *mut Vec<*mut *mut RawGc, LibcAlloc>,
+                    v: *mut Vec<*mut *mut RawGc>,
                 }
 
                 impl Tracer for VisitRoots {
@@ -103,15 +105,16 @@ impl Immix {
                     }
                 }
                 callback(
-                    self.data,
+                    data,
                     TracerPtr {
                         tracer: core::mem::transmute(&mut VisitRoots {
                             v: &mut precise_roots,
                         } as &mut dyn Tracer),
                     },
+                    ConservativeTracer { roots: &mut cons },
                 );
             }
-            let mut roots: Vec<*mut RawGc, LibcAlloc> = Vec::new_in(LibcAlloc);
+            let mut roots: Vec<*mut RawGc> = Vec::new();
             let mut all_blocks = (*self.immix).get_all_blocks();
             #[cfg(feature = "threaded")]
             {
@@ -129,6 +132,9 @@ impl Immix {
                         &mut roots,
                     );
                 }
+            }
+            for &(bottom, end) in cons.iter() {
+                self.collect_roots(bottom as *mut *mut u8, end as *mut *mut u8, &mut roots);
             }
             #[cfg(not(feature = "threaded"))]
             {
@@ -192,7 +198,7 @@ impl Immix {
         &mut self,
         from: *mut *mut u8,
         to: *mut *mut u8,
-        into: &mut Vec<*mut RawGc, LibcAlloc>,
+        into: &mut Vec<*mut RawGc>,
     ) {
         let mut scan = from;
         let mut end = to;
@@ -277,8 +283,8 @@ impl Immix {
             stack_end: 0 as *mut _,
             stack_bottom: 0 as *mut _,
             current_live_mark: false,
-            collect_roots_callback: None,
-            data: 0 as *mut _,
+            collect_roots_callback: Vec::new(),
+
             to_finalize: LinkedList::new(),
             #[cfg(feature = "threaded")]
             fin_lock: parking_lot::RawMutex::INIT,
@@ -288,9 +294,21 @@ impl Immix {
 }
 
 static mut SPACE: *mut Immix = 0 as *mut _;
+
+/// Register callback that will be invoked when GC starts.
+///
+///
+/// WARNING: There is no way to "unregister" this callback.
+#[no_mangle]
+pub extern "C" fn immix_register_ongc_callback(callback: CollectRootsCallback, data: *mut u8) {
+    unsafe {
+        (*SPACE).collect_roots_callback.push((callback, data));
+    }
+}
+
 /// no-op callback. This is used in place of `CollectRootsCallback` internally
 #[no_mangle]
-pub extern "C" fn immix_noop_callback(_: *mut u8, _: TracerPtr) {}
+pub extern "C" fn immix_noop_callback(_: *mut u8, _: TracerPtr, _: ConservativeTracer) {}
 /// no-op callback for object visitor. Use this if your object does not have any pointers.
 #[no_mangle]
 pub extern "C" fn immix_noop_visit(_: *mut u8, _: TracerPtr) {}
@@ -300,15 +318,15 @@ pub extern "C" fn immix_noop_visit(_: *mut u8, _: TracerPtr) {}
 /// - `dummy_sp`: must be pointer to stack variable for searching roots in stack.
 /// - `heap_size`: Maximum heap size. If this parameter is less than 512KB then it is set to 512KB.
 /// - `threshold`: GC threshold. if zero set to 30% of `heap_size` parameter.
-/// - `callback`: GC invokes this callback when collecting roots. You can use this to collect roots inside your VM.
-/// - `data`: Data passed to `callback`.
+/// - `callback`(Optional,might be null): GC invokes this callback when collecting roots. You can use this to collect roots inside your VM.
+/// - `data`(Optional,might be null): Data passed to `callback`.
 #[allow(improper_ctypes_definitions)]
 #[no_mangle]
 pub extern "C" fn immix_init(
     dummy_sp: *mut usize,
     mut heap_size: usize,
     mut threshold: usize,
-    callback: CollectRootsCallback,
+    callback: Option<CollectRootsCallback>,
     data: *mut u8,
 ) {
     unsafe {
@@ -319,9 +337,11 @@ pub extern "C" fn immix_init(
             threshold = ((30.0 * heap_size as f64) / 100.0).floor() as usize;
         }
         let mut space = Immix::new(heap_size, threshold);
-        space.collect_roots_callback = Some(callback);
+        if let Some(callback) = callback {
+            space.collect_roots_callback.push((callback, data));
+        }
         space.stack_bottom = dummy_sp as *mut u8;
-        space.data = data;
+
         let mem = malloc(core::mem::size_of::<Immix>()).cast::<Immix>();
         mem.write(space);
         SPACE = mem;

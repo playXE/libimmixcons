@@ -1,6 +1,6 @@
 use super::block::ImmixBlock;
 use super::constants::*;
-use crate::util::{Address, LibcAlloc};
+use crate::util::Address;
 #[cfg(windows)]
 mod _win {
     use super::*;
@@ -141,7 +141,7 @@ use parking_lot::lock_api::RawMutex;
 pub struct BlockAllocator {
     #[cfg(feature = "threaded")]
     lock: parking_lot::RawMutex,
-    free_blocks: alloc::vec::Vec<*mut ImmixBlock, LibcAlloc>,
+    free_blocks: alloc::vec::Vec<*mut ImmixBlock>,
 
     //pub bitmap: SpaceBitmap<16>,
     pub data_bound: *mut u8,
@@ -166,7 +166,7 @@ impl BlockAllocator {
             lock: parking_lot::RawMutex::INIT,
             data: map.aligned(),
             data_bound: map.end(),
-            free_blocks: alloc::vec::Vec::new_in(LibcAlloc),
+            free_blocks: alloc::vec::Vec::new(),
 
             mmap: map,
         };
