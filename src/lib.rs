@@ -10,7 +10,7 @@
     thread_local
 )]
 #![cfg_attr(test, feature(const_in_array_repeat_expressions))]
-#![cfg_attr(any(not(feature = "willdebug"), not(test)), no_std)]
+#![cfg_attr(not(test), no_std)]
 
 #[cfg(feature = "log")]
 #[macro_use]
@@ -457,7 +457,7 @@ pub struct GCObject {
 ///
 #[no_mangle]
 #[inline]
-pub extern "C" fn immix_alloc(size: usize, rtti: *mut GCRTTI) -> *mut GCObject {
+pub extern "C" fn immix_alloc(size: usize, rtti: *const GCRTTI) -> *mut GCObject {
     unsafe { (*SPACE).allocate(size, rtti as _) as *mut GCObject }
 }
 

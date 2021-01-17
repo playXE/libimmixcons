@@ -29,6 +29,27 @@ clang -c -O2 -flto=thin -o main.o ./main.c
 clang -flto=thin -fuse-ld=lld -L<path to libimmixcons.a> -llibimmixcons -o main -O2 ./cmain.o
 ```
 
+# Platform support
+- Linux
+
+  
+  Everything works as expected.
+- macOS
+
+
+  Everything works as expected, this library was firstly developed on macOS machine.
+
+
+- FreeBSD,OpenBSD,NetBSD
+
+
+  I don't know if it works or no, if you tested this library on these platforms please file an issue.
+
+- Windows
+
+
+  Should work but it is not tested.
+
 # TODO
 
 - More documentation and more examples.

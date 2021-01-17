@@ -1,14 +1,11 @@
 #[macro_use]
 pub(crate) mod bitmap_const;
+use core::sync::atomic::{AtomicPtr, Ordering};
 use core::{
     alloc::Allocator,
     hash::{Hash, Hasher},
     marker::PhantomData,
     ptr::NonNull,
-};
-use core::{
-    mem::MaybeUninit,
-    sync::atomic::{AtomicPtr, Ordering},
 };
 
 /// The mask to use for untagging a pointer.
@@ -552,17 +549,11 @@ impl<T> VolatileCell<T> {
 unsafe impl<T> Sync for VolatileCell<T> {}
 unsafe impl<T> Send for VolatileCell<T> {}
 
-extern "C" {
-    #[link(name = "llvm.eh.sjlj.setjmp")]
-    fn __llvm_setjmp(buf: *mut i8) -> i32;
-    #[link(name = "llvm.eh.sjlj.longjmp")]
-    fn __llvmlongjmp(buf: *mut i8);
-}
 type JmpBuf = [u64; 30];
 #[inline(always)]
 pub fn save_regs() {
-    unsafe {
-        let mut buf: JmpBuf = MaybeUninit::uninit().assume_init();
-        __llvm_setjmp(buf.as_mut_ptr().cast());
-    }
+    //unsafe {
+    //let mut buf: JmpBuf = MaybeUninit::uninit().assume_init();
+    //__llvm_setjmp(buf.as_mut_ptr().cast());
+    // }
 }
