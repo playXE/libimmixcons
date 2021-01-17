@@ -28,10 +28,13 @@ fn TreeSize(i: i32) -> i32 {
 fn NumIters(i: i32) -> i32 {
     2 * TreeSize(kStretchTreeDepth) / TreeSize(i)
 }
-fn Populate(idepth: i32, thisnode: &mut Gc<Node>) {
-    immix_mutator_yieldpoint();
+#[inline(never)]
+fn Populate(idepth: i32, mut thisnode: Gc<Node>) {
     if idepth <= 0 {
         return;
+    }
+    unsafe {
+        FOO = &mut thisnode;
     }
     thisnode.left = Some(immix_alloc_safe(Node {
         left: None,
@@ -45,10 +48,11 @@ fn Populate(idepth: i32, thisnode: &mut Gc<Node>) {
         i: 0,
         j: 0,
     }));
-    Populate(idepth - 1, thisnode.left.as_mut().unwrap());
-    Populate(idepth - 1, thisnode.right.as_mut().unwrap())
+    immix_mutator_yieldpoint();
+    Populate(idepth - 1, thisnode.left.unwrap());
+    Populate(idepth - 1, thisnode.right.unwrap())
 }
-
+#[inline(never)]
 fn MakeTree(idepth: i32) -> Gc<Node> {
     immix_mutator_yieldpoint();
     if idepth <= 0 {
@@ -70,6 +74,8 @@ fn MakeTree(idepth: i32) -> Gc<Node> {
         result
     }
 }
+
+static mut FOO: *mut Gc<Node> = 0 as *mut _;
 #[inline(never)]
 fn TimeConstruction(depth: i32) {
     let iNumIters = NumIters(depth);
@@ -81,8 +87,11 @@ fn TimeConstruction(depth: i32) {
             i: 0,
             j: 0,
         });
-        Populate(depth, &mut tempTree);
 
+        Populate(depth, tempTree);
+        unsafe {
+            FOO = &mut tempTree;
+        }
         // destroy tempTree
     }
 
@@ -122,7 +131,10 @@ fn gcbench() {
         i: 0,
         j: 0,
     });
-    Populate(kLongLivedTreeDepth, &mut long_lived);
+    unsafe {
+        FOO = &mut long_lived;
+    }
+    Populate(kLongLivedTreeDepth, long_lived);
     let mut d = kMinTreeDepth;
     while d <= kMaxTreeDepth {
         TimeConstruction(d);
@@ -139,16 +151,14 @@ fn gcbench() {
 
 fn criterion_bench(c: &mut Criterion) {
     let mut sp = 0;
-    immix_init(
-        &mut sp,
-        2 * 1024 * 1024 * 1024,
-        0,
-        immix_noop_callback,
-        0 as *mut _,
+    immix_init(50 * 1024 * 1024, 0, immix_noop_callback, 0 as *mut _);
+    immix_register_thread();
+    let mut group = c.benchmark_group("immix");
+    group.sample_size(10).bench_function(
+        "gcbench",
+        #[inline(never)]
+        |b| b.iter(|| gcbench()),
     );
-    immix_register_thread(&mut sp as *mut usize);
-
-    c.bench_function("libimmixcons (30% threshold)", |b| b.iter(|| gcbench()));
 }
 criterion_group!(benches, criterion_bench);
 criterion_main!(benches);

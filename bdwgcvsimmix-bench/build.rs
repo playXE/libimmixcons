@@ -24,23 +24,23 @@ fn main() {
     let out_dir = env::var("OUT_DIR").unwrap();
     let mut boehm_src = PathBuf::from(out_dir);
     boehm_src.push(BOEHM_DIR);
+    if !boehm_src.exists() {
+        run("git", |cmd| {
+            cmd.arg("clone").arg(BOEHM_REPO).arg(&boehm_src)
+        });
 
-    run("git", |cmd| {
-        cmd.arg("clone").arg(BOEHM_REPO).arg(&boehm_src)
-    });
+        run("git", |cmd| {
+            cmd.arg("clone")
+                .arg(BOEHM_ATOMICS_REPO)
+                .current_dir(&boehm_src)
+        });
 
-    run("git", |cmd| {
-        cmd.arg("clone")
-            .arg(BOEHM_ATOMICS_REPO)
-            .current_dir(&boehm_src)
-    });
-
-    env::set_current_dir(&boehm_src).unwrap();
-    run("cmake", |cmd| cmd.arg("."));
-    run("cmake", |cmd| {
-        cmd.args(&["--build", ".", "--config", "Release"])
-    });
-
+        env::set_current_dir(&boehm_src).unwrap();
+        run("cmake", |cmd| cmd.arg("."));
+        run("cmake", |cmd| {
+            cmd.args(&["--build", ".", "--config", "Release"])
+        });
+    }
     let libpath = PathBuf::from(&boehm_src);
     //libpath.push(BOEHM_DIR);
     println!(

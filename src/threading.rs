@@ -2,10 +2,14 @@
 mod sync {
     #[cfg(feature = "willdebug")]
     use crate::safepoint::GC_RUNNING;
-    use core::sync::atomic::{AtomicI8, Ordering};
     use core::{cell::UnsafeCell, debug_assert_ne};
+    use core::{
+        sync::atomic::{AtomicI8, Ordering},
+        usize,
+    };
     use parking_lot::Mutex;
     pub struct TLSState {
+        pub stack_bounds: StackBounds,
         pub safepoint: *mut usize,
         // Whether it is safe to execute GC at the same time.
         pub gc_state: i8,
@@ -29,14 +33,26 @@ mod sync {
         #[inline(always)]
         pub fn yieldpoint(&mut self) {
             unsafe {
+                //crate::util::save_regs();
                 #[cfg(not(feature = "willdebug"))]
                 {
-                    debug_assert_ne!(self.safepoint, 0 as *mut usize);
+                    let mut x1 = 0;
+                    let mut x2 = 1;
+                    let mut x3 = 2;
+                    let mut x4 = 3;
+                    let mut x5 = 4;
+                    let mut x6 = 5;
+                    let mut x7 = 6;
+                    let x8 = 7;
+                    let x9 = 8;
+                    let x10 = 9;
 
-                    self.stack_end = get_sp!() as *mut u8;
-                    core::ptr::read_volatile(self.safepoint);
-                    //core::ptr::write_volatile(self.safepoint, get_sp!());
-                    //core::sync::atomic::fence(Ordering::SeqCst);
+                    asm!("/* {0} {1} {2} {3} {4}  */", inlateout(reg) x1,inlateout(reg) x2,inlateout(reg) x3,inlateout(reg) x4,inlateout(reg) x5);
+                    debug_assert_ne!(self.safepoint, 0 as *mut usize);
+                    core::sync::atomic::compiler_fence(Ordering::SeqCst);
+                    core::ptr::write_volatile(&mut self.stack_end, get_sp!() as *mut _);
+                    core::ptr::write_volatile(self.safepoint, 0);
+                    core::sync::atomic::compiler_fence(Ordering::SeqCst);
                 }
                 #[cfg(feature = "willdebug")]
                 {
@@ -77,6 +93,10 @@ mod sync {
     #[thread_local]
     static TLS: UnsafeCell<TLSState> = {
         UnsafeCell::new(TLSState {
+            stack_bounds: StackBounds {
+                origin: 0 as *mut u8,
+                bound: 0 as *mut u8,
+            },
             safepoint: 0 as *mut usize,
             gc_state: 0,
             current_block: None, //alloc: 0 as *mut _,
@@ -87,9 +107,18 @@ mod sync {
     };
     #[no_mangle]
     #[inline]
-    pub extern "C" fn immix_prepare_thread(sp: *mut usize) {
-        immix_get_tls_state().safepoint = unsafe { crate::safepoint::SAFEPOINT_PAGE as *mut _ };
-        immix_get_tls_state().stack_bottom = sp as *mut _;
+    pub(crate) extern "C" fn immix_prepare_thread() {
+        let ptls = immix_get_tls_state();
+        ptls.safepoint = unsafe { crate::safepoint::SAFEPOINT_PAGE as *mut _ };
+        ptls.stack_bounds = unsafe { StackBounds::new_thread_stack_bounds(crate::thread_self()) };
+        ptls.stack_bottom = ptls.stack_bounds.origin;
+        debug!(
+            "Prepare thread {:p} TLS state at {:p}\nStack bounds: {:p}->{:p}",
+            crate::thread_self() as *mut u8,
+            ptls,
+            ptls.stack_bounds.origin,
+            ptls.stack_bounds.bound
+        );
     }
     #[no_mangle]
     #[inline]
@@ -108,7 +137,7 @@ mod sync {
     }
     use alloc::vec::Vec;
 
-    use crate::{allocation::BlockTuple, PAGESIZE};
+    use crate::{allocation::BlockTuple, stack_bounds::StackBounds};
     pub struct Threads {
         pub threads: Mutex<Vec<*mut TLSState>>,
     }
@@ -124,44 +153,16 @@ mod sync {
     unsafe impl Send for Threads {}
     pub static THREADS: once_cell::sync::Lazy<Threads> =
         once_cell::sync::Lazy::new(|| Threads::new());
-    static HAS_MAIN: AtomicI8 = AtomicI8::new(0);
-    /// Registers main thread.
-    ///
-    /// # Panics
-    /// Panics if main thread is already registered.
-    ///
-    ///
-    #[no_mangle]
-    pub extern "C" fn immix_register_main_thread(dummy_sp: *mut u8) {
-        immix_register_thread(dummy_sp.cast());
-        /*#[cfg(test)]
-        {
-            if HAS_MAIN.load(Ordering::Relaxed) == 1 {
-                return;
-            }
-        }
-        assert!(
-            HAS_MAIN.load(Ordering::Relaxed) == 1,
-            "main thread already registered"
-        );
 
-        HAS_MAIN.store(1, Ordering::Release);
-
-        let mut lock = THREADS.threads.lock();
-        immix_prepare_thread(dummy_sp.cast());
-        immix_get_tls_state().stack_bottom = dummy_sp;
-        //let tls = get_tls_state() as *mut _;
-        lock.push(immix_get_tls_state() as *mut _);*/
-    }
     /// Register thread.
     /// ## Inputs
     /// `sp`: pointer to variable on stack for searching roots on stack.
     ///
     #[no_mangle]
-    pub extern "C" fn immix_register_thread(sp: *mut usize) {
+    pub extern "C" fn immix_register_thread() {
         let threads = &*THREADS;
         let mut lock = threads.threads.lock();
-        immix_prepare_thread(sp);
+        immix_prepare_thread();
 
         lock.push(immix_get_tls_state() as *mut _);
     }
@@ -228,22 +229,13 @@ mod unsync {
     pub(crate) fn set_gc_and_wait() {
         /* no-op */
     }
-    /// Registers main thread.
-    ///
-    /// # Panics
-    /// Panics if main thread is already registered.
-    ///
-    ///
-    #[no_mangle]
-    pub extern "C" fn immix_register_main_thread(_: *mut u8) {
-        /* no-op */
-    }
+
     /// Register thread.
     /// ## Inputs
     /// `sp`: pointer to variable on stack for searching roots on stack.
     ///
     #[no_mangle]
-    pub extern "C" fn immix_register_thread(_: *mut usize) {
+    pub extern "C" fn immix_register_thread() {
         /* no-op */
     }
     /// Unregister thread.

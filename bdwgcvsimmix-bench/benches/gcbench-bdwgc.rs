@@ -126,10 +126,10 @@ struct Array {
 fn criterion_bench(c: &mut Criterion) {
     let mut heap = Heap::new();
 
-    c.bench_function("bdwgc", |b| b.iter(|| gcbench(&mut heap)));
-    let mut group = c.benchmark_group("threaded");
+    let mut group = c.benchmark_group("bdwgc");
     group.sample_size(10);
-    /*group.bench_function("bdwgc", |b| {
+    group.bench_function("gcbench", |b| b.iter(|| gcbench(&mut heap)));
+    /*group.bench_function("gcb", |b| {
         b.iter(|| {
             let mut threads = Vec::with_capacity(4);
             for _ in 0..2 {

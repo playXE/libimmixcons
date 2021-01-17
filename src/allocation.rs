@@ -426,7 +426,10 @@ impl ImmixSpace {
             bits += base;
             bits
         }
-        let addr = addr.sub(addr.to_usize() % 16);
+        let addr = addr;
+        if addr.to_usize() % 16 != 0 {
+            return None;
+        }
         if unsafe { (*self.block_allocator).is_in_space(addr) } && self.bitmap.test(addr.to_usize())
         {
             return Some(addr);

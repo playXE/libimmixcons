@@ -19,8 +19,8 @@ extern crate log;
 use core::ptr::NonNull;
 
 use allocation::ImmixSpace;
-use atomic::Ordering;
 use constants::{BLOCK_SIZE, LARGE_OBJECT};
+use core::sync::atomic::Ordering;
 use large_object_space::LargeObjectSpace;
 extern crate alloc;
 
@@ -37,6 +37,7 @@ pub mod object;
 pub mod safepoint;
 pub mod signals;
 pub mod space_bitmap;
+pub mod stack_bounds;
 pub mod threading;
 use alloc::collections::LinkedList;
 use alloc::vec::Vec;
@@ -49,6 +50,11 @@ use object::*;
 use object::{RawGc, TracerPtr};
 #[cfg(feature = "threaded")]
 use parking_lot::lock_api::RawMutex;
+
+#[cfg(not(feature = "threaded"))]
+use stack_bounds::StackBounds;
+
+#[cfg(feature = "threaded")]
 use threading::{immix_get_tls_state, GC_STATE_WAITING};
 use util::*;
 
@@ -56,6 +62,8 @@ use util::*;
 mod tests;
 
 pub struct Immix {
+    #[cfg(not(feature = "threaded"))]
+    bounds: StackBounds,
     los: LargeObjectSpace,
     immix: *mut ImmixSpace,
     stack_bottom: *mut u8,
@@ -76,6 +84,12 @@ pub enum CollectionType {
     ImmixEvacCollection,
 }
 
+#[inline(never)]
+fn stack_pointer() -> usize {
+    let sp = 0usize;
+    &sp as *const usize as usize
+}
+
 pub type CollectRootsCallback =
     extern "C" fn(data: *mut u8, tracer: TracerPtr, cons_tracer: ConservativeTracer);
 
@@ -83,6 +97,7 @@ impl Immix {
     #[inline(never)]
     fn collect_internal(&mut self, evacuation: bool, emergency: bool) {
         unsafe {
+            crate::util::save_regs();
             let old_state;
             let threads;
             #[cfg(feature = "threaded")]
@@ -219,8 +234,8 @@ impl Immix {
         to: *mut *mut u8,
         into: &mut Vec<*mut RawGc>,
     ) {
-        let mut scan = from;
-        let mut end = to;
+        let mut scan = align_usize(from as usize, 16) as *mut *mut u8;
+        let mut end = align_usize(to as usize, 16) as *mut *mut u8;
         if scan.is_null() || end.is_null() {
             return;
         }
@@ -245,7 +260,22 @@ impl Immix {
                 scan = scan.offset(1);
                 continue;
             }
+            pub fn align_down(addr: usize, align: usize) -> usize {
+                /*if !align.is_power_of_two() {
+                    panic!("align should be power of two");
+                }*/
+                addr & !(align - 1)
+            }
+            //let ptr = align_down(ptr as usize, 16) as *mut u8;
+            if let Some(ptr) = (*self.immix).filter(Address::from_ptr(ptr)) {
+                let ptr = ptr.to_mut_ptr::<u8>();
 
+                (&mut *ptr.cast::<RawGc>()).pin();
+
+                into.push(ptr.cast());
+                debug!("Found root {:p} at {:p}", ptr, scan);
+            }
+            let ptr = ptr.sub(8);
             if let Some(ptr) = (*self.immix).filter(Address::from_ptr(ptr)) {
                 let ptr = ptr.to_mut_ptr::<u8>();
 
@@ -266,7 +296,7 @@ impl Immix {
                 //panic!();
                 self.collect_internal(false, true);
             }
-            let size = core::mem::size_of::<RawGc>() + size;
+            let size = align_usize(core::mem::size_of::<RawGc>() + size, 16);
 
             let ptr = if size >= LARGE_OBJECT {
                 self.los.alloc(size, rtti)
@@ -310,6 +340,11 @@ impl Immix {
 
     fn new(size: usize, threshold: usize) -> Self {
         Self {
+            #[cfg(not(feature = "threaded"))]
+            bounds: StackBounds {
+                origin: 0 as *mut u8,
+                bound: 0 as *mut u8,
+            },
             allocated: 0,
             threshold,
             immix: ImmixSpace::new(align_usize(size + BLOCK_SIZE, *PAGESIZE)),
@@ -349,7 +384,6 @@ pub extern "C" fn immix_noop_visit(_: *mut u8, _: TracerPtr) {}
 /// Initialize Immix space.
 ///
 /// ## Inputs
-/// - `dummy_sp`: must be pointer to stack variable for searching roots in stack.
 /// - `heap_size`: Maximum heap size. If this parameter is less than 512KB then it is set to 512KB.
 /// - `threshold`: GC threshold. if zero set to 30% of `heap_size` parameter.
 /// - `callback`(Optional,might be null): GC invokes this callback when collecting roots. You can use this to collect roots inside your VM.
@@ -357,7 +391,6 @@ pub extern "C" fn immix_noop_visit(_: *mut u8, _: TracerPtr) {}
 #[allow(improper_ctypes_definitions)]
 #[no_mangle]
 pub extern "C" fn immix_init(
-    dummy_sp: *mut usize,
     mut heap_size: usize,
     mut threshold: usize,
     callback: CollectRootsCallback,
@@ -378,7 +411,11 @@ pub extern "C" fn immix_init(
             let mut space = Immix::new(heap_size, threshold);
 
             space.collect_roots_callback.push((callback, data));
-            space.stack_bottom = dummy_sp as *mut u8;
+            #[cfg(not(feature = "threaded"))]
+            {
+                space.bounds = StackBounds::new_thread_stack_bounds(thread_self() as _);
+                space.stack_bottom = space.bounds.origin as *mut _;
+            }
             signals::install_default_signal_handlers();
             #[cfg(feature = "threaded")]
             {

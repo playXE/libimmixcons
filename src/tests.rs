@@ -23,7 +23,7 @@ fn simple() {
         immix_noop_callback,
         0 as *mut _,
     );
-    immix_register_thread(&mut sp);
+    immix_register_thread();
     immix_mutator_yieldpoint();
     inner_simple();
     immix_unregister_thread();

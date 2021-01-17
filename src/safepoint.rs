@@ -24,14 +24,14 @@ unsafe fn enable_safepoint(_threads: &[*mut TLSState]) {
         VirtualProtect(
             pageaddr as *mut _,
             *crate::PAGESIZE as _,
-            PAGE_READONLY,
+            PAGE_READWRITE,
             &mut old_prot,
         );
     }
 
     #[cfg(target_family = "unix")]
     {
-        mprotect(pageaddr.cast(), *crate::PAGESIZE, PROT_READ);
+        mprotect(pageaddr.cast(), *crate::PAGESIZE, PROT_READ | PROT_WRITE);
     }
     //}
 }
@@ -57,7 +57,11 @@ unsafe fn disable_safepoint(_idx: usize, _threads: &[*mut TLSState]) {
 
     #[cfg(target_family = "unix")]
     {
-        mprotect(pageaddr.cast(), *crate::PAGESIZE, PROT_READ | PROT_WRITE);
+        mprotect(
+            pageaddr.cast(),
+            *crate::PAGESIZE,
+            PROT_READ | PROT_WRITE | PROT_WRITE,
+        );
     }
     //}
 }
@@ -71,7 +75,7 @@ pub(crate) unsafe fn safepoint_alloc_page() -> usize {
         addr = mmap(
             0 as *mut _,
             pgsz,
-            PROT_READ | PROT_WRITE,
+            PROT_READ | PROT_WRITE | PROT_WRITE,
             MAP_PRIVATE | MAP_ANONYMOUS,
             -1,
             0,
@@ -100,7 +104,7 @@ pub unsafe fn safepoint_init() {
         addr = mmap(
             0 as *mut _,
             pgsz,
-            PROT_READ,
+            PROT_READ | PROT_WRITE,
             MAP_PRIVATE | MAP_ANONYMOUS,
             -1,
             0,
@@ -111,7 +115,7 @@ pub unsafe fn safepoint_init() {
     };
     #[cfg(target_family = "windows")]
     {
-        addr = VirtualAlloc(0 as *mut _, pgsz, MEM_COMMIT, PAGE_READONLY);
+        addr = VirtualAlloc(0 as *mut _, pgsz, MEM_COMMIT, PAGE_READWRITE);
     }
 
     if addr.is_null() {

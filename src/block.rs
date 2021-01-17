@@ -39,9 +39,7 @@ impl ImmixBlock {
     }*/
     pub fn new(at: *mut u8) -> &'static mut Self {
         unsafe {
-            //let block = memmap::MmapMut::map_anon(0).unwrap();
             let ptr = at as *mut Self;
-            core::ptr::write_bytes(ptr as *mut u8, 0, BLOCK_SIZE);
             debug_assert!(ptr as usize % 32 * 1024 == 0);
             ptr.write(Self {
                 line_map: LineMap::new(),
@@ -50,11 +48,7 @@ impl ImmixBlock {
                 hole_count: 0,
                 evacuation_candidate: false,
             });
-            //(&mut *ptr).line_map.bitmap_begin = (&*ptr).line_map.bitmap_.as_ptr() as *mut usize;
-            //(&mut *ptr).object_map.bitmap_begin = (&*ptr).object_map.bitmap_.as_ptr() as *mut usize;
 
-            debug_assert!((*ptr).line_map.is_empty());
-            //assert!((&*ptr).object_map.is_empty());
             &mut *ptr
         }
     }
@@ -89,10 +83,10 @@ impl ImmixBlock {
     pub fn scan_block(&self, last_high_offset: u16) -> Option<(u16, u16)> {
         let last_high_index = last_high_offset as usize / LINE_SIZE;
         let mut low_index = NUM_LINES_PER_BLOCK - 1;
-        debug!(
+        /*debug!(
             "Scanning block {:p} for a hole with last_high_offset {}",
             self, last_high_index
-        );
+        );*/
         for index in (last_high_index + 1)..NUM_LINES_PER_BLOCK {
             if !self
                 .line_map
@@ -114,25 +108,25 @@ impl ImmixBlock {
         }
 
         if low_index == high_index && high_index != (NUM_LINES_PER_BLOCK - 1) {
-            debug!("Rescan: Found single line hole? in block {:p}", self);
+            //debug!("Rescan: Found single line hole? in block {:p}", self);
             return self.scan_block((high_index * LINE_SIZE - 1) as u16);
         } else if low_index < (NUM_LINES_PER_BLOCK - 1) {
-            debug!(
+            /* debug!(
                 "Found low index {} and high index {} in block {:p}",
                 low_index, high_index, self
-            );
+            );*/
 
-            debug!(
+            /*debug!(
                 "Index offsets: ({},{})",
                 low_index * LINE_SIZE,
                 high_index * LINE_SIZE - 1
-            );
+            );*/
             return Some((
                 align_usize(low_index * LINE_SIZE, 16) as u16,
                 (high_index * LINE_SIZE - 1) as u16,
             ));
         }
-        debug!("Found no hole in block {:p}", self);
+        //debug!("Found no hole in block {:p}", self);
 
         None
     }

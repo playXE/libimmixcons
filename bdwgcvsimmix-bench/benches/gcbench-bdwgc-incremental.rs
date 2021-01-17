@@ -129,7 +129,9 @@ fn criterion_bench(c: &mut Criterion) {
         GC_enable_incremental();
     }
 
-    c.bench_function("bdwgc incremental", |b| b.iter(|| gcbench(&mut heap)));
+    let mut group = c.benchmark_group("bdwgc incremental");
+    group.sample_size(10);
+    group.bench_function("gcbench", |b| b.iter(|| gcbench(&mut heap)));
 }
 criterion_group!(benches, criterion_bench);
 criterion_main!(benches);

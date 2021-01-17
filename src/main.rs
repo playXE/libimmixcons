@@ -27,7 +27,7 @@ fn TreeSize(i: i32) -> i32 {
 fn NumIters(i: i32) -> i32 {
     2 * TreeSize(kStretchTreeDepth) / TreeSize(i)
 }
-fn Populate(idepth: i32, thisnode: &mut Gc<Node>) {
+fn Populate(idepth: i32, thisnode: &mut Node) {
     immix_mutator_yieldpoint();
     if idepth <= 0 {
         return;
@@ -139,16 +139,11 @@ fn gcbench() {
 fn main() {
     immix_init_logger();
     let mut sp = 0;
-    immix_init(
-        &mut sp,
-        2 * 1024 * 1024 * 1024,
-        0,
-        immix_noop_callback,
-        0 as *mut _,
-    );
-    immix_register_thread(&mut sp as *mut usize);
-
-    gcbench();
+    immix_init(2 * 1024 * 1024 * 1024, 0, immix_noop_callback, 0 as *mut _);
+    immix_register_thread();
+    for _ in 0..10 {
+        gcbench();
+    }
 
     immix_unregister_thread();
     println!("Done");

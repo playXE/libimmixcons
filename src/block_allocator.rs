@@ -189,6 +189,7 @@ impl BlockAllocator {
             .pop()
             .map(|x| {
                 self.mmap.commit(x as *mut u8, BLOCK_SIZE);
+                ImmixBlock::new(x as *mut u8);
                 x
             })
             .or_else(|| self.build_block());
