@@ -138,7 +138,7 @@ fn gcbench() {
 
 fn main() {
     immix_init_logger();
-    let mut sp = 0;
+
     immix_init(2 * 1024 * 1024 * 1024, 0, immix_noop_callback, 0 as *mut _);
     immix_register_thread();
     for _ in 0..10 {

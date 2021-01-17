@@ -42,6 +42,14 @@
 #define GC_STATE_SAFE 2
 #endif
 
+#if defined(IMMIX_THREADED)
+typedef struct TLSState TLSState;
+#endif
+
+#if !defined(IMMIX_THREADED)
+typedef struct TLSState TLSState;
+#endif
+
 typedef struct TracerPtr {
   uintptr_t tracer[2];
 } TracerPtr;
@@ -125,14 +133,12 @@ void immix_noop_visit(uint8_t*, struct TracerPtr);
  * Initialize Immix space.
  *
  * ## Inputs
- * - `dummy_sp`: must be pointer to stack variable for searching roots in stack.
  * - `heap_size`: Maximum heap size. If this parameter is less than 512KB then it is set to 512KB.
  * - `threshold`: GC threshold. if zero set to 30% of `heap_size` parameter.
  * - `callback`(Optional,might be null): GC invokes this callback when collecting roots. You can use this to collect roots inside your VM.
  * - `data`(Optional,might be null): Data passed to `callback`.
  */
-void immix_init(uintptr_t *dummy_sp,
-                uintptr_t heap_size,
+void immix_init(uintptr_t heap_size,
                 uintptr_t threshold,
                 CollectRootsCallback callback,
                 uint8_t *data);
@@ -163,6 +169,10 @@ struct GCObject *immix_alloc(uintptr_t size,
  */
 void immix_collect(bool move_objects);
 
+extern int32_t __llvm_setjmp(int8_t *buf);
+
+extern void __llvmlongjmp(int8_t *buf);
+
 void tracer_trace(struct TracerPtr p, struct RawGc **gc_val);
 
 /**
@@ -171,7 +181,7 @@ void tracer_trace(struct TracerPtr p, struct RawGc **gc_val);
 void conservative_roots_add(struct ConservativeTracer *tracer, uintptr_t begin, uintptr_t end);
 
 #if defined(IMMIX_THREADED)
-void immix_prepare_thread(uintptr_t *sp);
+struct TLSState *immix_get_tls_state(void);
 #endif
 
 #if defined(IMMIX_THREADED)
@@ -187,24 +197,12 @@ void immix_mutator_yieldpoint(void);
 
 #if defined(IMMIX_THREADED)
 /**
- * Registers main thread.
- *
- * # Panics
- * Panics if main thread is already registered.
- *
- *
- */
-void immix_register_main_thread(uint8_t *dummy_sp);
-#endif
-
-#if defined(IMMIX_THREADED)
-/**
  * Register thread.
  * ## Inputs
  * `sp`: pointer to variable on stack for searching roots on stack.
  *
  */
-void immix_register_thread(uintptr_t *sp);
+void immix_register_thread(void);
 #endif
 
 #if defined(IMMIX_THREADED)
@@ -251,24 +249,12 @@ int8_t immix_safe_leave(int8_t state);
 
 #if !defined(IMMIX_THREADED)
 /**
- * Registers main thread.
- *
- * # Panics
- * Panics if main thread is already registered.
- *
- *
- */
-void immix_register_main_thread(uint8_t*);
-#endif
-
-#if !defined(IMMIX_THREADED)
-/**
  * Register thread.
  * ## Inputs
  * `sp`: pointer to variable on stack for searching roots on stack.
  *
  */
-void immix_register_thread(uintptr_t*);
+void immix_register_thread(void);
 #endif
 
 #if !defined(IMMIX_THREADED)

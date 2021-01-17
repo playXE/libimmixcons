@@ -36,18 +36,6 @@ mod sync {
                 //crate::util::save_regs();
                 #[cfg(not(feature = "willdebug"))]
                 {
-                    let mut x1 = 0;
-                    let mut x2 = 1;
-                    let mut x3 = 2;
-                    let mut x4 = 3;
-                    let mut x5 = 4;
-                    let mut x6 = 5;
-                    let mut x7 = 6;
-                    let x8 = 7;
-                    let x9 = 8;
-                    let x10 = 9;
-
-                    asm!("/* {0} {1} {2} {3} {4}  */", inlateout(reg) x1,inlateout(reg) x2,inlateout(reg) x3,inlateout(reg) x4,inlateout(reg) x5);
                     debug_assert_ne!(self.safepoint, 0 as *mut usize);
                     core::sync::atomic::compiler_fence(Ordering::SeqCst);
                     core::ptr::write_volatile(&mut self.stack_end, get_sp!() as *mut _);
@@ -110,7 +98,7 @@ mod sync {
     pub(crate) extern "C" fn immix_prepare_thread() {
         let ptls = immix_get_tls_state();
         ptls.safepoint = unsafe { crate::safepoint::SAFEPOINT_PAGE as *mut _ };
-        ptls.stack_bounds = unsafe { StackBounds::new_thread_stack_bounds(crate::thread_self()) };
+        ptls.stack_bounds = StackBounds::current_thread_stack_bounds();
         ptls.stack_bottom = ptls.stack_bounds.origin;
         debug!(
             "Prepare thread {:p} TLS state at {:p}\nStack bounds: {:p}->{:p}",

@@ -554,18 +554,15 @@ unsafe impl<T> Send for VolatileCell<T> {}
 
 extern "C" {
     #[link(name = "llvm.eh.sjlj.setjmp")]
-    fn setjmp(buf: *mut i8) -> i32;
+    fn __llvm_setjmp(buf: *mut i8) -> i32;
     #[link(name = "llvm.eh.sjlj.longjmp")]
-    fn longjmp(buf: *mut i8);
+    fn __llvmlongjmp(buf: *mut i8);
 }
 type JmpBuf = [u64; 30];
 #[inline(always)]
 pub fn save_regs() {
     unsafe {
-        extern "C" {
-            fn setjmp(buf: *mut i8) -> i32;
-        }
         let mut buf: JmpBuf = MaybeUninit::uninit().assume_init();
-        setjmp(buf.as_mut_ptr().cast());
+        __llvm_setjmp(buf.as_mut_ptr().cast());
     }
 }
