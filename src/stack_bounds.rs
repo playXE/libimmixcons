@@ -111,7 +111,7 @@ impl StackBounds {
             &mut guard_page,
             core::mem::size_of::<MEMORY_BASIC_INFORMATION>(),
         );
-        let end_of_stack = stack_origin.AllocationBAse as *mut u8;
+        let end_of_stack = stack_origin.AllocationBase as *mut u8;
         let bound = end_of_stack.add(guard_page.RegionSize as _);
         Self {
             origin: origin as *mut u8,
