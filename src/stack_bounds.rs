@@ -8,7 +8,7 @@ pub struct StackBounds {
 
 #[cfg(any(target_os = "macos", target_os = "ios"))]
 impl StackBounds {
-    pub unsafe fn new_thread_stack_bounds(thread: libc::pthread_t) {
+    pub unsafe fn new_thread_stack_bounds(thread: libc::pthread_t) -> Self {
         let origin = libc::pthread_get_stackaddr_np(thread);
         let size = libc::pthread_get_stacksize_np(thread);
         let bound = origin.add(size);
@@ -18,14 +18,14 @@ impl StackBounds {
         }
     }
     pub fn current_thread_stack_bounds() -> Self {
-        unsafe { Self::new_thread_stack_bounds(crate::thread_self()) }
+        unsafe { Self::new_thread_stack_bounds(crate::thread_self() as _) }
     }
 }
 
 #[cfg(all(unix, not(any(target_os = "macos", target_os = "ios"))))]
 impl StackBounds {
     #[cfg(target_os = "openbsd")]
-    unsafe fn new_thread_stack_bounds(thread: libc::pthread_t) {
+    unsafe fn new_thread_stack_bounds(thread: libc::pthread_t) -> Self {
         let mut stack: libc::stack_t = zeroed();
         libc::pthread_stackseg_np(thread, &mut stack);
         let origin = stack.ss_sp;
@@ -60,7 +60,7 @@ impl StackBounds {
     }
 
     pub fn current_thread_stack_bounds() -> Self {
-        unsafe { Self::new_thread_stack_bounds(crate::thread_self()) }
+        unsafe { Self::new_thread_stack_bounds(crate::thread_self() as _) }
     }
 }
 
