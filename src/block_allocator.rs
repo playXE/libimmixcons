@@ -48,14 +48,14 @@ mod _win {
 
         pub fn dontneed(&self, page: *mut u8, size: usize) {
             unsafe {
-                DiscardVirtualMemory(page.cast(), size as _);
-                //VirtualFree(page.cast(), size, MEM_DECOMMIT);
+                //DiscardVirtualMemory(page.cast(), size as _);
+                VirtualFree(page.cast(), size, MEM_DECOMMIT);
             }
         }
 
         pub fn commit(&self, page: *mut u8, size: usize) {
             unsafe {
-                // VirtualAlloc(page.cast(), size, MEM_COMMIT, PAGE_READWRITE);
+                VirtualAlloc(page.cast(), size, MEM_COMMIT, PAGE_READWRITE);
             }
         }
     }
