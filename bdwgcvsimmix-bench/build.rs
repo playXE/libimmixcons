@@ -53,7 +53,7 @@ fn main() {
         &libpath.as_path().to_str().unwrap()
     );
     for entry in std::fs::read_dir(&libpath).unwrap() {
-        println!("-entry {}", entry.unwrap());
+        println!("-entry {:?}", entry.unwrap().path());
     }
     println!("link to {}", libpath.display());
     println!("cargo:rustc-link-lib=gc");
