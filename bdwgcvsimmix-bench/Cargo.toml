@@ -18,6 +18,7 @@ bindgen = "0.56"
 [dev-dependencies]
 instant = "0.1"
 criterion = "0.3"
+cfg-if = "1"
 
 [profile.bench]
 opt-level = 2
@@ -38,7 +39,7 @@ rpath = false
 name = "gcbench-immix"
 harness = false
 
-[[bench]]
+[[target.'cfg(unix)'.bench]]
 name = "gcbench-bdwgc"
 harness = false
 

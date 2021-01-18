@@ -1,4 +1,5 @@
 #![allow(dead_code, non_snake_case, unused_variables, non_upper_case_globals)]
+
 use bdwgcvsimmix_bench::*;
 use criterion::{criterion_group, criterion_main, Criterion};
 fn gcbench(space: &mut Heap) {
