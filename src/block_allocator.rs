@@ -8,11 +8,11 @@ mod _win {
     use super::*;
     use core::{ptr::null_mut, usize};
 
+    use winapi::um::memoryapi::DiscardVirtualMemory;
     use winapi::um::{
         memoryapi::{VirtualAlloc, VirtualFree},
         winnt::{MEM_COMMIT, MEM_DECOMMIT, MEM_RELEASE, MEM_RESERVE, PAGE_READWRITE},
     };
-
     pub struct Mmap {
         start: *mut u8,
         end: *mut u8,
@@ -55,7 +55,7 @@ mod _win {
 
         pub fn commit(&self, page: *mut u8, size: usize) {
             unsafe {
-                VirtualAlloc(page.cast(), size, MEM_COMMIT, PAGE_READWRITE);
+                // VirtualAlloc(page.cast(), size, MEM_COMMIT, PAGE_READWRITE);
             }
         }
     }
