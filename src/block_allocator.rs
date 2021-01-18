@@ -48,7 +48,8 @@ mod _win {
 
         pub fn dontneed(&self, page: *mut u8, size: usize) {
             unsafe {
-                VirtualFree(page.cast(), size, MEM_DECOMMIT);
+                DiscardVirtualMemory(page.cast(), size as _);
+                //VirtualFree(page.cast(), size, MEM_DECOMMIT);
             }
         }
 
