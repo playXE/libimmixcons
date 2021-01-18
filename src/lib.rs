@@ -413,7 +413,7 @@ pub extern "C" fn immix_init(
             space.collect_roots_callback.push((callback, data));
             #[cfg(not(feature = "threaded"))]
             {
-                space.bounds = StackBounds::new_thread_stack_bounds(thread_self() as _);
+                space.bounds = StackBounds::current_thread_stack_bounds();
                 space.stack_bottom = space.bounds.origin as *mut _;
             }
             signals::install_default_signal_handlers();
