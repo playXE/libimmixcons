@@ -88,6 +88,7 @@ mod _unix {
                     -1,
                     0,
                 );
+                libc::madvise(map, size, libc::MADV_SEQUENTIAL);
                 if map == libc::MAP_FAILED {
                     panic!("mmap failed");
                 }
@@ -119,7 +120,11 @@ mod _unix {
 
         pub fn commit(&self, page: *mut u8, size: usize) {
             unsafe {
-                libc::madvise(page as *mut _, size as _, libc::MADV_WILLNEED);
+                libc::madvise(
+                    page as *mut _,
+                    size as _,
+                    libc::MADV_WILLNEED | libc::MADV_SEQUENTIAL,
+                );
             }
         }
     }
