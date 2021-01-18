@@ -42,6 +42,8 @@ fn main() {
         });
     }
     let libpath = PathBuf::from(&boehm_src);
+    let mut libpath2 = libpath.clone();
+    libpath2.push("Release");
     //libpath.push(BOEHM_DIR);
     println!(
         "cargo:rustc=flags=-L{}",
@@ -51,6 +53,15 @@ fn main() {
     println!(
         "cargo:rustc-link-search=all={}",
         &libpath.as_path().to_str().unwrap()
+    );
+    println!(
+        "cargo:rustc=flags=-L{}",
+        &libpath2.as_path().to_str().unwrap()
+    );
+    //panic!();
+    println!(
+        "cargo:rustc-link-search=all={}",
+        &libpath2.as_path().to_str().unwrap()
     );
     for entry in std::fs::read_dir(&libpath).unwrap() {
         println!("-entry {:?}", entry.unwrap().path());

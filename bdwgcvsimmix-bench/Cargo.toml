@@ -39,7 +39,7 @@ rpath = false
 name = "gcbench-immix"
 harness = false
 
-[[target.'cfg(unix)'.bench]]
+[[bench]]
 name = "gcbench-bdwgc"
 harness = false
 
