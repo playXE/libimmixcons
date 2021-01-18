@@ -49,7 +49,7 @@ unsafe fn disable_safepoint(_idx: usize, _threads: &[*mut TLSState]) {
         let mut old_prot: winapi::shared::minwindef::DWORD = 0;
         VirtualProtect(
             pageaddr as *mut _,
-            *PAGESIZE as _,
+            *crate::PAGESIZE as _,
             PAGE_READWRITE,
             &mut old_prot,
         );

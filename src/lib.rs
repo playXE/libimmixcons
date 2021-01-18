@@ -488,7 +488,9 @@ pub extern "C" fn immix_collect(move_objects: bool) {
 pub(crate) static PAGESIZE: once_cell::sync::Lazy<usize> = once_cell::sync::Lazy::new(|| unsafe {
     #[cfg(target_family = "windows")]
     {
-        let mut si: SYSTEM_INFO = std::mem::MaybeUninit::zeroed().assume_init();
+        use winapi::um::sysinfoapi::GetSystemInfo;
+        use winapi::um::sysinfoapi::SYSTEM_INFO;
+        let mut si: SYSTEM_INFO = core::mem::MaybeUninit::zeroed().assume_init();
         GetSystemInfo(&mut si);
         si.dwPageSize as _
     }
