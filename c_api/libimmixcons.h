@@ -223,7 +223,7 @@ int8_t immix_unsafe_leave(int8_t state);
  * Returns current state to restore later.
  */
 int8_t immix_safe_enter(void);
-
+const GCRTTI* immix_object_get_rtti(GCObject*);
 
 /**
  * Leave safe for GC state and restore previous state from `state` argument.

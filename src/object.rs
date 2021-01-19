@@ -277,6 +277,15 @@ impl<T: HeapObject + ?Sized> Gc<T> {
             ptr: unsafe { NonNull::new_unchecked(ptr.cast::<RawGc>().sub(1) as *mut RawGc) },
         }
     }
+
+    pub fn get_rtti(&self) -> &'static GCRTTI {
+        unsafe { (*self.ptr.as_ptr()).rtti() }
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn immix_object_get_rtti(object: &crate::GCObject) -> &'static GCRTTI {
+    unsafe { (*(object as *const _ as *const RawGc)).rtti() }
 }
 #[derive(Clone, Copy)]
 #[repr(C)]
