@@ -165,15 +165,6 @@ pub fn object_ty_of_type<T: HeapObject + Sized>() -> usize {
     result
 }
 impl RawGc {
-    /*pub fn as_dyn(&self) -> &'static mut dyn HeapObject {
-            unsafe {
-                core::mem::transmute(core::raw::TraitObject {
-                    vtable: self.vtable() as *mut (),
-                    data: self.data() as *mut (),
-                })
-            }
-        }
-    */
     pub fn rtti(&self) -> &GCRTTI {
         unsafe { &*(self.vtable() as *mut GCRTTI) }
     }
@@ -382,5 +373,39 @@ impl<T: HeapObject + ?Sized> Copy for Gc<T> {}
 impl<T: HeapObject + ?Sized> Clone for Gc<T> {
     fn clone(&self) -> Self {
         *self
+    }
+}
+
+static NOOP_SINK: core::sync::atomic::AtomicUsize = core::sync::atomic::AtomicUsize::new(0);
+
+#[inline]
+#[no_mangle]
+pub extern "C" fn immix_noop1(word: usize) {
+    NOOP_SINK.store(word, core::sync::atomic::Ordering::Relaxed)
+}
+
+/// Explicitly tell the collector that an object is reachable    
+/// at a particular program point.  This prevents the argument   
+/// reference from being optimized away, even it is otherwise no   
+/// longer needed.  It should have no visible effect in the      
+/// absence of finalizers or disappearing links.  But it may be  
+/// needed to prevent finalizers from running while the          
+/// associated external resource is still in use.                
+/// The function is sometimes called keep_alive in other         
+/// settings.  
+/// ```ingore
+/// let x = immix_alloc_safe(Foo {...});
+/// keep_on_stack!(&x); // 'x' will be on stack and not optimized by compiler to registers.
+///    
+///    
+///          
+/// ```
+
+#[macro_export]
+macro_rules! keep_on_stack {
+    ($($e: expr),*) => {
+        $(
+            $crate::object::immix_noop1($e as *const _ as usize);
+        )*
     }
 }

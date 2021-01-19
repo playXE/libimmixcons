@@ -1,3 +1,5 @@
+#ifndef __LIBIMMIXCONS_H__
+#define __LIBIMMIXCONS_H__
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -34,21 +36,11 @@
  */
 #define EVAC_TRIGGER_THRESHHOLD 0.25
 
-#if defined(IMMIX_THREADED)
 #define GC_STATE_WAITING 1
-#endif
 
-#if defined(IMMIX_THREADED)
 #define GC_STATE_SAFE 2
-#endif
 
-#if defined(IMMIX_THREADED)
 typedef struct TLSState TLSState;
-#endif
-
-#if !defined(IMMIX_THREADED)
-typedef struct TLSState TLSState;
-#endif
 
 typedef struct TracerPtr {
   uintptr_t tracer[2];
@@ -65,17 +57,6 @@ typedef void (*CollectRootsCallback)(uint8_t *data, struct TracerPtr tracer, str
 
 /**
  * Main type used for object tracing,finalization and allocation.
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
  */
 typedef struct GCRTTI {
   /**
@@ -111,6 +92,19 @@ typedef struct RawGc {
   struct TaggedPointer_usize vtable;
 } RawGc;
 
+
+void immix_noop1(void* word);
+/* Explicitly tell the collector that an object is reachable    */
+/* at a particular program point.  This prevents the argument   */
+/* pointer from being optimized away, even it is otherwise no   */
+/* longer needed.  It should have no visible effect in the      */
+/* absence of finalizers or disappearing links.  But it may be  */
+/* needed to prevent finalizers from running while the          */
+/* associated external resource is still in use.                */
+/* The function is sometimes called keep_alive in other         */
+/* settings.                                                    */
+#define immix_keep_on_stack(x) immix_noop1((void*)x)
+
 /**
  * Register callback that will be invoked when GC starts.
  *
@@ -135,8 +129,8 @@ void immix_noop_visit(uint8_t*, struct TracerPtr);
  * ## Inputs
  * - `heap_size`: Maximum heap size. If this parameter is less than 512KB then it is set to 512KB.
  * - `threshold`: GC threshold. if zero set to 30% of `heap_size` parameter.
- * - `callback`(Optional,might be null): GC invokes this callback when collecting roots. You can use this to collect roots inside your VM.
- * - `data`(Optional,might be null): Data passed to `callback`.
+ * - `callback`: GC invokes this callback when collecting roots. You can use this to collect roots inside your VM.
+ * - `data`: Data passed to `callback`.
  */
 void immix_init(uintptr_t heap_size,
                 uintptr_t threshold,
@@ -169,9 +163,6 @@ struct GCObject *immix_alloc(uintptr_t size,
  */
 void immix_collect(bool move_objects);
 
-extern int32_t __llvm_setjmp(int8_t *buf);
-
-extern void __llvmlongjmp(int8_t *buf);
 
 void tracer_trace(struct TracerPtr p, struct RawGc **gc_val);
 
@@ -180,11 +171,10 @@ void tracer_trace(struct TracerPtr p, struct RawGc **gc_val);
  */
 void conservative_roots_add(struct ConservativeTracer *tracer, uintptr_t begin, uintptr_t end);
 
-#if defined(IMMIX_THREADED)
-struct TLSState *immix_get_tls_state(void);
-#endif
 
-#if defined(IMMIX_THREADED)
+struct TLSState *immix_get_tls_state(void);
+
+
 /**
  * Checks if current thread should yield. GC won't be able to stop a mutator unless this function is put into code.
  *
@@ -193,26 +183,25 @@ struct TLSState *immix_get_tls_state(void);
  * this will emit volatile load without any conditional jumps so it is very small overhead compared to conditional yieldpoints.
  */
 void immix_mutator_yieldpoint(void);
-#endif
 
-#if defined(IMMIX_THREADED)
 /**
- * Register thread.
- * ## Inputs
- * `sp`: pointer to variable on stack for searching roots on stack.
- *
+ * Register GC thread.
+ * 
+ * 
+ * If thread already registered nothing will happen.
+ * 
  */
 void immix_register_thread(void);
-#endif
 
-#if defined(IMMIX_THREADED)
+
 /**
  * Unregister thread.
+ * 
+ * 
+ * If thread already unregistered this will result in no-op.
  */
 void immix_unregister_thread(void);
-#endif
 
-#if defined(IMMIX_THREADED)
 /**
  * Enter unsafe GC state. This means current thread runs "managed by GC code" and GC *must* stop this thread
  * at GC cycle.
@@ -220,17 +209,13 @@ void immix_unregister_thread(void);
  * Returns current state to restore later.
  */
 int8_t immix_unsafe_enter(void);
-#endif
 
-#if defined(IMMIX_THREADED)
 /**
  * Leave unsafe GC state and restore previous state from `state` argument. This function has yieldpoint internally so thread
  * might be suspended for GC.
  */
 int8_t immix_unsafe_leave(int8_t state);
-#endif
 
-#if defined(IMMIX_THREADED)
 /**
  * Enter safe for GC state. When thread is in safe state it is allowed to execute code at the same time with the GC.
  *
@@ -238,74 +223,12 @@ int8_t immix_unsafe_leave(int8_t state);
  * Returns current state to restore later.
  */
 int8_t immix_safe_enter(void);
-#endif
 
-#if defined(IMMIX_THREADED)
+
 /**
  * Leave safe for GC state and restore previous state from `state` argument.
  */
 int8_t immix_safe_leave(int8_t state);
-#endif
 
-#if !defined(IMMIX_THREADED)
-/**
- * Register thread.
- * ## Inputs
- * `sp`: pointer to variable on stack for searching roots on stack.
- *
- */
-void immix_register_thread(void);
-#endif
 
-#if !defined(IMMIX_THREADED)
-/**
- * Unregister thread.
- */
-void immix_unregister_thread(void);
-#endif
-
-#if !defined(IMMIX_THREADED)
-/**
- * Checks if current thread should yield. GC won't be able to stop a thread unless this function is put into code.
- *
- * # Performance overhead
- * This function is no-op when libimmixcons was built without `threaded` feature. When `threaded` feature is enabled
- * this will emit volatile load without any conditional jumps so it is very small overhead compared to conditional yieldpoints.
- */
-void immix_mutator_yieldpoint(void);
-#endif
-
-#if !defined(IMMIX_THREADED)
-/**
- * Enter unsafe GC state. This means current thread runs "managed by GC code" and GC *must* stop this thread
- * at GC cycle.
- *
- * Returns current state to restore later.
- */
-int8_t immix_unsafe_enter(void);
-#endif
-
-#if !defined(IMMIX_THREADED)
-/**
- * Leave unsafe GC state and restore previous state from `state` argument. This function has yieldpoint internally so thread
- * might be suspended for GC.
- */
-int8_t immix_unsafe_leave(int8_t state);
-#endif
-
-#if !defined(IMMIX_THREADED)
-/**
- * Enter safe for GC state. When thread is in safe state it is allowed to execute code at the same time with the GC.
- *
- *
- * Returns current state to restore later.
- */
-int8_t immix_safe_enter(void);
-#endif
-
-#if !defined(IMMIX_THREADED)
-/**
- * Leave safe for GC state and restore previous state from `state` argument.
- */
-int8_t immix_safe_leave(int8_t state);
 #endif

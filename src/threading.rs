@@ -95,8 +95,11 @@ mod sync {
     };
     #[no_mangle]
     #[inline]
-    pub(crate) extern "C" fn immix_prepare_thread() {
+    pub(crate) extern "C" fn immix_prepare_thread() -> bool {
         let ptls = immix_get_tls_state();
+        if !ptls.safepoint.is_null() {
+            return false;
+        }
         ptls.safepoint = unsafe { crate::safepoint::SAFEPOINT_PAGE as *mut _ };
         ptls.stack_bounds = StackBounds::current_thread_stack_bounds();
         ptls.stack_bottom = ptls.stack_bounds.origin;
@@ -107,6 +110,7 @@ mod sync {
             ptls.stack_bounds.origin,
             ptls.stack_bounds.bound
         );
+        true
     }
     #[no_mangle]
     #[inline]
@@ -150,9 +154,9 @@ mod sync {
     pub extern "C" fn immix_register_thread() {
         let threads = &*THREADS;
         let mut lock = threads.threads.lock();
-        immix_prepare_thread();
-
-        lock.push(immix_get_tls_state() as *mut _);
+        if immix_prepare_thread() {
+            lock.push(immix_get_tls_state() as *mut _);
+        }
     }
     /// Unregister thread.
     #[no_mangle]

@@ -8,7 +8,6 @@ mod _win {
     use super::*;
     use core::{ptr::null_mut, usize};
 
-    use winapi::um::memoryapi::DiscardVirtualMemory;
     use winapi::um::{
         memoryapi::{VirtualAlloc, VirtualFree},
         winnt::{MEM_COMMIT, MEM_DECOMMIT, MEM_RELEASE, MEM_RESERVE, PAGE_READWRITE},
