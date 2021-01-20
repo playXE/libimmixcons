@@ -445,7 +445,7 @@ pub extern "C" fn immix_init_logger() {
 }
 #[repr(C)]
 pub struct GCObject {
-    pub rtti: *const GCRTTI,
+    pub rtti: u64,
 }
 
 /// Allocate memory of `size + sizeof(GCObject)` bytes in Immix heap and set object RTTI to `rtti`. If `size` >= 8KB then

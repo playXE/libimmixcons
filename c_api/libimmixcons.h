@@ -78,7 +78,7 @@ typedef struct GCRTTI {
 } GCRTTI;
 
 typedef struct GCObject {
-  const struct GCRTTI *rtti;
+  uint64_t rtti;
 } GCObject;
 
 /**
