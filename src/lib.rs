@@ -37,30 +37,34 @@ pub enum GcStats {
     Summary,
     Verbose,
 }
+
+extern "C" {
+    fn printf(c: *const i8, ...) -> i32;
+}
 #[no_mangle]
 pub extern "C" fn immix_dump_summary() {
     unsafe {
         let stats = &(*SPACE).stats;
         let runtime = (*SPACE).timer.stop();
         let (mutator, gc) = stats.percentage(runtime);
-        libc::printf(
+        printf(
             b"GC stats: total=%.1f\n\0".as_ptr().cast(),
             runtime as libc::c_double,
         );
-        libc::printf(
+        printf(
             b"GC stats: mutator=%.1f\n\0".as_ptr().cast(),
             stats.mutator(runtime) as libc::c_double,
         );
-        libc::printf(
+        printf(
             b"GC stats: collection=%.1f\n\n\0".as_ptr().cast(),
             stats.pause() as libc::c_double,
         );
 
-        libc::printf(
+        printf(
             b"GC stats: collections count=%i\n\0".as_ptr().cast(),
             stats.collections() as i32,
         );
-        libc::printf(b"GC summary: %.1fms collection (%i), %.1fms mutator, %.1f total (%f%% mutator, %f%% GC)\n\0".as_ptr().cast(),stats.pause() as libc::c_double,stats.collections() as i32,stats.mutator(runtime) as libc::c_double,runtime as libc::c_double,mutator as libc::c_double,gc as libc::c_double);
+        printf(b"GC summary: %.1fms collection (%i), %.1fms mutator, %.1f total (%f%% mutator, %f%% GC)\n\0".as_ptr().cast(),stats.pause() as libc::c_double,stats.collections() as i32,stats.mutator(runtime) as libc::c_double,runtime as libc::c_double,mutator as libc::c_double,gc as libc::c_double);
     }
 }
 
@@ -276,8 +280,8 @@ impl Immix {
                 let duration = timer.stop();
                 self.stats.add(duration);
                 if self.gc_stats == GcStats::Verbose {
-                    libc::printf("--GC cycle stats--\n\0".as_bytes().as_ptr().cast());
-                    libc::printf(
+                    printf("--GC cycle stats--\n\0".as_bytes().as_ptr().cast());
+                    printf(
                         b"GC freed %i bytes, heap %.3fKiB->%.3fKiB\n\0"
                             .as_ptr()
                             .cast(),
@@ -292,24 +296,24 @@ impl Immix {
                         stop_threads.whole_nanoseconds() as u64
                     );*/
                     #[cfg(feature = "threaded")]
-                    libc::printf(
+                    printf(
                         b"GC suspended threads in %i ms (%lu ns)\n\0"
                             .as_ptr()
                             .cast(),
                         stop_threads.whole_milliseconds() as i32,
                         stop_threads.whole_nanoseconds() as u64,
                     );
-                    libc::printf(
+                    printf(
                         b"Collected roots in %i ms (%lu ns)\n\0".as_ptr().cast(),
                         collect_roots.whole_milliseconds() as u32,
                         collect_roots.whole_nanoseconds() as u64,
                     );
-                    libc::printf(
+                    printf(
                         b"Marking took %i ms (%lu ns)\n\0".as_ptr().cast(),
                         mark.whole_milliseconds() as u32,
                         mark.whole_nanoseconds() as u64,
                     );
-                    libc::printf(
+                    printf(
                         "Whole GC cycle took %.6f ms\n\0".as_ptr().cast(),
                         duration as libc::c_double,
                     );
