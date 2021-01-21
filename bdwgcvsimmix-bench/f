@@ -1,0 +1,1061 @@
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+Gnuplot not found, using plotters backend
+Benchmarking immix/gcbench
+Benchmarking immix/gcbench: Warming up for 3.0000 s
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap
+Warning: Unable to complete 10 samples in 5.0s. You may wish to increase target time to 6.1s.
+Benchmarking immix/gcbench: Collecting 10 samples in estimated 6.0948 s (10 iterations)
+ % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freBenchmarking immix/gcbench: Analyzing
+immix/gcbench           time:   [587.45 ms 595.24 ms 604.09 ms]
+                        change: [-4.7469% -3.5046% -1.9307%] (p = 0.00 < 0.05)
+                        Performance has improved.
+
+ed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+-- GC cycle stats--
+GC freed % bytes, heap % KiB 
+GC stats: total=12006.4
+GC stats: mutator=11133.6
+GC stats: collection=872.8
+
+GC stats: collections count=512
+GC summary: 872.8ms collection (512), 11133.6ms mutator, 12006.4 total (93.000000% mutator, 7.000000% GC)

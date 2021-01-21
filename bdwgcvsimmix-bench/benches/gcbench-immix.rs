@@ -1,7 +1,7 @@
 #![allow(dead_code, non_snake_case, unused_variables, non_upper_case_globals)]
 use criterion::{criterion_group, criterion_main, Criterion};
 use libimmixcons::{object::*, *};
-use threading::{immix_mutator_yieldpoint, immix_register_thread, immix_unregister_thread};
+use threading::{immix_mutator_yieldpoint, immix_register_thread};
 pub struct Node {
     left: Option<Gc<Self>>,
     right: Option<Gc<Self>>,
@@ -33,9 +33,7 @@ fn Populate(idepth: i32, mut thisnode: Gc<Node>) {
     if idepth <= 0 {
         return;
     }
-    unsafe {
-        FOO = &mut thisnode;
-    }
+    keep_on_stack!(&mut thisnode);
     thisnode.left = Some(immix_alloc_safe(Node {
         left: None,
         right: None,
@@ -131,9 +129,7 @@ fn gcbench() {
         i: 0,
         j: 0,
     });
-    unsafe {
-        FOO = &mut long_lived;
-    }
+
     Populate(kLongLivedTreeDepth, long_lived);
     let mut d = kMinTreeDepth;
     while d <= kMaxTreeDepth {
@@ -141,6 +137,7 @@ fn gcbench() {
         d += 2;
         immix_mutator_yieldpoint();
     }
+    keep_on_stack!(&mut long_lived);
     /*println!(
         "GC bench finished\n  GC threshold is now: {}\n GC cycles happened: {}",
         formatted_size(space.gc_threshold()),
@@ -150,8 +147,8 @@ fn gcbench() {
 }
 
 fn criterion_bench(c: &mut Criterion) {
-    let mut sp = 0;
     immix_init(50 * 1024 * 1024, 0, immix_noop_callback, 0 as *mut _);
+    //immix_enable_stats(GcStats::Summary);
     immix_register_thread();
     let mut group = c.benchmark_group("immix");
     group.sample_size(10).bench_function(
@@ -159,6 +156,7 @@ fn criterion_bench(c: &mut Criterion) {
         #[inline(never)]
         |b| b.iter(|| gcbench()),
     );
+    immix_dump_summary();
 }
 criterion_group!(benches, criterion_bench);
 criterion_main!(benches);
