@@ -148,7 +148,7 @@ fn gcbench() {
 
 fn criterion_bench(c: &mut Criterion) {
     immix_init(50 * 1024 * 1024, 0, immix_noop_callback, 0 as *mut _);
-    //immix_enable_stats(GcStats::Summary);
+    immix_enable_stats(GcStats::Summary);
     immix_register_thread();
     let mut group = c.benchmark_group("immix");
     group.sample_size(10).bench_function(
