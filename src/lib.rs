@@ -24,6 +24,46 @@ use core::sync::atomic::Ordering;
 use large_object_space::LargeObjectSpace;
 extern crate alloc;
 
+#[no_mangle]
+pub extern "C" fn immix_enable_stats(val: GcStats) {
+    unsafe {
+        (*SPACE).gc_stats = val;
+    }
+}
+#[derive(Copy, Clone, PartialEq, Eq)]
+#[repr(i32)]
+pub enum GcStats {
+    None = 0,
+    Summary,
+    Verbose,
+}
+#[no_mangle]
+pub extern "C" fn immix_dump_summary() {
+    unsafe {
+        let stats = &(*SPACE).stats;
+        let runtime = (*SPACE).timer.stop();
+        let (mutator, gc) = stats.percentage(runtime);
+        libc::printf(
+            b"GC stats: total=%.1f\n\0".as_ptr().cast(),
+            runtime as libc::c_double,
+        );
+        libc::printf(
+            b"GC stats: mutator=%.1f\n\0".as_ptr().cast(),
+            stats.mutator(runtime) as libc::c_double,
+        );
+        libc::printf(
+            b"GC stats: collection=%.1f\n\n\0".as_ptr().cast(),
+            stats.pause() as libc::c_double,
+        );
+
+        libc::printf(
+            b"GC stats: collections count=%i\n\0".as_ptr().cast(),
+            stats.collections() as i32,
+        );
+        libc::printf(b"GC summary: %.1fms collection (%i), %.1fms mutator, %.1f total (%f%% mutator, %f%% GC)\n\0".as_ptr().cast(),stats.pause() as libc::c_double,stats.collections() as i32,stats.mutator(runtime) as libc::c_double,runtime as libc::c_double,mutator as libc::c_double,gc as libc::c_double);
+    }
+}
+
 #[macro_use]
 pub(crate) mod util;
 pub mod allocation;
@@ -67,16 +107,18 @@ pub struct Immix {
     los: LargeObjectSpace,
     immix: *mut ImmixSpace,
     stack_bottom: *mut u8,
+    gc_stats: GcStats,
     stack_end: *mut u8,
     allocated: usize,
     threshold: usize,
     current_live_mark: bool,
     collect_roots_callback: Vec<(CollectRootsCallback, *mut u8)>,
-
+    timer: util::timer::Timer,
     collector: Collector,
     to_finalize: LinkedList<*mut RawGc>,
     #[cfg(feature = "threaded")]
     fin_lock: Mutex,
+    stats: CollectionStats,
 }
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum CollectionType {
@@ -94,14 +136,18 @@ pub type CollectRootsCallback =
     extern "C" fn(data: *mut u8, tracer: TracerPtr, cons_tracer: ConservativeTracer);
 
 impl Immix {
+    #[allow(unused_variables)]
     #[inline(never)]
     fn collect_internal(&mut self, evacuation: bool, emergency: bool) {
         unsafe {
+            let mut timer = util::timer::Timer::new(self.gc_stats != GcStats::None);
             crate::util::save_regs();
             let old_state;
             let threads;
+            let stop_threads;
             #[cfg(feature = "threaded")]
             {
+                let start = time::Instant::now();
                 let ptls = immix_get_tls_state();
                 ptls.stack_end = get_sp!() as *mut _;
                 old_state = ptls.gc_state;
@@ -112,13 +158,15 @@ impl Immix {
                     return;
                 }
                 threads = safepoint::safepoint_wait_for_the_world();
+                stop_threads = start.elapsed();
             };
             #[cfg(not(feature = "threaded"))]
             {
+                stop_threads = ();
                 old_state = 0;
                 threads = ();
             }
-
+            let collect_roots = time::Instant::now();
             let mut precise_roots = Vec::new();
             let mut cons = Vec::new();
             for &(callback, data) in self.collect_roots_callback.iter() {
@@ -176,6 +224,7 @@ impl Immix {
                     &mut roots,
                 );
             }
+            let collect_roots = collect_roots.elapsed();
             self.collector.extend_all_blocks(all_blocks);
             let collection_type = self.collector.prepare_collection(
                 evacuation,
@@ -185,6 +234,7 @@ impl Immix {
                 (*(*self.immix).block_allocator).total_blocks(),
                 emergency,
             );
+            let mark = time::Instant::now();
 
             let visited = self.collector.collect(
                 &collection_type,
@@ -194,6 +244,7 @@ impl Immix {
                 &mut self.los,
                 !self.current_live_mark,
             );
+            let mark = mark.elapsed();
             for root in roots.iter() {
                 {
                     (&mut **root).unpin()
@@ -215,9 +266,54 @@ impl Immix {
             self.current_live_mark = !self.current_live_mark;
             (*self.immix).set_current_live_mark(self.current_live_mark);
             self.los.current_live_mark = self.current_live_mark;
+
+            let prev = self.allocated;
             self.allocated = visited;
             if visited >= self.threshold {
                 self.threshold = (visited as f64 * 1.75) as usize;
+            }
+            if self.gc_stats != GcStats::None {
+                let duration = timer.stop();
+                self.stats.add(duration);
+                if self.gc_stats == GcStats::Verbose {
+                    libc::printf("--GC cycle stats--\n\0".as_bytes().as_ptr().cast());
+                    libc::printf(
+                        b"GC freed %i bytes, heap %.3fKiB->%.3fKiB\n\0"
+                            .as_ptr()
+                            .cast(),
+                        prev - visited,
+                        prev as f64 / 1024f64,
+                        visited as f64 / 1024f64,
+                    );
+                    /*#[cfg(feature = "threaded")]
+                    printf!(
+                        "GC suspended threads in %ims (%lns)\n\0",
+                        stop_threads.whole_milliseconds() as i32,
+                        stop_threads.whole_nanoseconds() as u64
+                    );*/
+                    #[cfg(feature = "threaded")]
+                    libc::printf(
+                        b"GC suspended threads in %i ms (%lu ns)\n\0"
+                            .as_ptr()
+                            .cast(),
+                        stop_threads.whole_milliseconds() as i32,
+                        stop_threads.whole_nanoseconds() as u64,
+                    );
+                    libc::printf(
+                        b"Collected roots in %i ms (%lu ns)\n\0".as_ptr().cast(),
+                        collect_roots.whole_milliseconds() as u32,
+                        collect_roots.whole_nanoseconds() as u64,
+                    );
+                    libc::printf(
+                        b"Marking took %i ms (%lu ns)\n\0".as_ptr().cast(),
+                        mark.whole_milliseconds() as u32,
+                        mark.whole_nanoseconds() as u64,
+                    );
+                    libc::printf(
+                        "Whole GC cycle took %.6f ms\n\0".as_ptr().cast(),
+                        duration as libc::c_double,
+                    );
+                }
             }
             #[cfg(feature = "threaded")]
             {
@@ -340,6 +436,9 @@ impl Immix {
 
     fn new(size: usize, threshold: usize) -> Self {
         Self {
+            timer: util::timer::Timer::new(false),
+            gc_stats: GcStats::None,
+            stats: CollectionStats::new(),
             #[cfg(not(feature = "threaded"))]
             bounds: StackBounds {
                 origin: 0 as *mut u8,
@@ -424,6 +523,7 @@ pub extern "C" fn immix_init(
             let mem = malloc(core::mem::size_of::<Immix>()).cast::<Immix>();
             mem.write(space);
             SPACE = mem;
+            (*SPACE).timer = util::timer::Timer::new(true);
         }
     }
 }
@@ -512,5 +612,67 @@ pub(crate) fn thread_self() -> u64 {
     #[cfg(unix)]
     unsafe {
         libc::pthread_self() as u64
+    }
+}
+
+struct CollectionStats {
+    collections: usize,
+    total_pause: f32,
+    pauses: Vec<f32>,
+}
+
+impl CollectionStats {
+    fn new() -> CollectionStats {
+        CollectionStats {
+            collections: 0,
+            total_pause: 0f32,
+            pauses: Vec::new(),
+        }
+    }
+
+    fn add(&mut self, pause: f32) {
+        self.collections += 1;
+        self.total_pause += pause;
+        self.pauses.push(pause);
+    }
+
+    fn pause(&self) -> f32 {
+        self.total_pause
+    }
+
+    fn pauses(&self) -> AllNumbers {
+        AllNumbers(self.pauses.clone())
+    }
+
+    fn mutator(&self, runtime: f32) -> f32 {
+        runtime - self.total_pause
+    }
+
+    fn collections(&self) -> usize {
+        self.collections
+    }
+
+    fn percentage(&self, runtime: f32) -> (f32, f32) {
+        let gc_percentage = ((self.total_pause / runtime) * 100.0).round();
+        let mutator_percentage = 100.0 - gc_percentage;
+
+        (mutator_percentage, gc_percentage)
+    }
+}
+
+pub struct AllNumbers(Vec<f32>);
+
+impl core::fmt::Display for AllNumbers {
+    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
+        write!(f, "[")?;
+        let mut first = true;
+        for num in &self.0 {
+            if !first {
+                write!(f, ",")?;
+            }
+            write!(f, "{:.1}", num)?;
+            first = false;
+        }
+        write!(f, "]")
     }
 }

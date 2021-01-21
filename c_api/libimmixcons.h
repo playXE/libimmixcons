@@ -40,6 +40,13 @@
 
 #define GC_STATE_SAFE 2
 
+#define GC_STATS_NONE 0
+#define GC_STATS_SUMMARY 1
+#define GC_STATS_VERBOSE 2
+
+void immix_enable_stats(int state);
+void immix_dump_summary(void);
+
 typedef struct TLSState TLSState;
 
 typedef struct TracerPtr {
