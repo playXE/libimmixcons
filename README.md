@@ -48,7 +48,7 @@ clang -flto=thin -fuse-ld=lld -L<path to libimmixcons.a> -llibimmixcons -o main 
 - Windows
 
 
-  Should work but it is not tested.
+  Should work but it is not properly tested,GC stats printing is unsupported.
 
 # TODO
 
