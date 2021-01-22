@@ -1,5 +1,5 @@
 use crate::threading::*;
-use core::sync::atomic::{AtomicBool, Ordering};
+use core::sync::atomic::{fence, AtomicBool, Ordering};
 use libc::*;
 use parking_lot::Mutex;
 #[cfg(target_family = "windows")]
@@ -183,9 +183,18 @@ pub fn safepoint_end_gc(threads: &[*mut TLSState]) {
 }
 
 pub fn safepoint_wait_gc() {
-    while GC_RUNNING.load(Ordering::Relaxed) || GC_RUNNING.load(Ordering::Acquire) {
+    let mut i = 0;
+    while GC_RUNNING.load(Ordering::Relaxed) {
+        i += 1;
+        if i % 50 == 0 {
+            #[cfg(unix)]
+            unsafe {
+                libc::sched_yield();
+            }
+        }
         core::hint::spin_loop();
     }
+    fence(Ordering::Acquire);
 }
 
 pub fn addr_in_safepoint(addr: usize) -> bool {
