@@ -385,12 +385,14 @@ impl<T: HeapObject + ?Sized> Clone for Gc<T> {
     }
 }
 
-static NOOP_SINK: core::sync::atomic::AtomicUsize = core::sync::atomic::AtomicUsize::new(0);
+static mut NOOP_SINK: usize = 0;
 
 #[inline]
 #[no_mangle]
 pub extern "C" fn immix_noop1(word: usize) {
-    NOOP_SINK.store(word, core::sync::atomic::Ordering::Relaxed)
+    unsafe {
+        core::ptr::write_volatile(&mut NOOP_SINK, core::ptr::read_volatile(&word));
+    }
 }
 
 /// Explicitly tell the collector that an object is reachable    
