@@ -43,7 +43,7 @@ macro_rules! make_rtti_for {
             needs_finalization: false,
             heap_size: {
                 extern "C" fn size(data: *mut u8) -> usize {
-                    unsafe { (*data.add(8).cast::<$t>()).heap_size() }
+                    unsafe { (*data.add(8).cast::<$t>()).heap_size() + 8 }
                 }
                 size
             },
@@ -169,10 +169,7 @@ impl RawGc {
         unsafe { &*(self.vtable() as *mut GCRTTI) }
     }
     pub fn object_size(&self) -> usize {
-        align_usize(
-            (self.rtti().heap_size)(self as *const Self as *mut u8) + core::mem::size_of::<Self>(),
-            16,
-        )
+        align_usize((self.rtti().heap_size)(self as *const Self as *mut u8), 16)
     }
 
     pub fn data(&self) -> *mut u8 {

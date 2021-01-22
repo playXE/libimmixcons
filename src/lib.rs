@@ -405,7 +405,7 @@ impl Immix {
                 //panic!();
                 self.collect_internal(false, true);
             }
-            let size = align_usize(core::mem::size_of::<RawGc>() + size, 16);
+            let size = align_usize(size, 16);
 
             let ptr = if size >= LARGE_OBJECT {
                 self.los.alloc(size, rtti)
